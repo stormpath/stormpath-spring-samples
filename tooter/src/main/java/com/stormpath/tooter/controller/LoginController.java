@@ -12,27 +12,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
 /**
- * Created with IntelliJ IDEA.
- * User: ecrisostomo
- * Date: 6/7/12
- * Time: 11:09 AM
- * To change this template use File | Settings | File Templates.
+ * @since 0.1
  */
 @Controller
 @RequestMapping("/login")
 public class LoginController {
 
-    LoginValidator loginValidator;
-
     @Autowired
-    public LoginController(LoginValidator loginValidator) {
-        this.loginValidator = loginValidator;
-    }
+    private LoginValidator loginValidator;
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(
-            @ModelAttribute("customer") Customer customer,
-            BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
 
         loginValidator.validate(customer, result);
 

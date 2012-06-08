@@ -10,11 +10,15 @@
     http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <context:component-scan base-package="com.stormpath.tooter"/>
+    <mvc:annotation-driven/>
+    <mvc:default-servlet-handler/>
 
-    <mvc:view-controller path="/" view-name="index"/>
-    <mvc:view-controller path="/login" view-name="login"/>
+    <mvc:view-controller path="/" view-name="redirect:/login"/>
 
-    <bean name="urlController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
 
     <bean class="com.stormpath.tooter.validator.LoginValidator"/>
 
@@ -24,14 +28,5 @@
     </bean>
 
 
-    <bean id="viewResolver"
-          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix">
-            <value>/WEB-INF/jsp/</value>
-        </property>
-        <property name="suffix">
-            <value>.jsp</value>
-        </property>
-    </bean>
 
 </beans>
