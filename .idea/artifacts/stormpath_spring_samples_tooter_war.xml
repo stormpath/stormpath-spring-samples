@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="stormpath-spring-samples-tooter:war">
-    <output-path>$PROJECT_DIR$/tooter/target</output-path>
-    <root id="archive" name="stormpath-spring-samples-tooter-0.2.0-SNAPSHOT.war">
-      <element id="artifact" artifact-name="stormpath-spring-samples-tooter:war exploded" />
-    </root>
-  </artifact>
-</component>
