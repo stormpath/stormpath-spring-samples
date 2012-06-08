@@ -23,10 +23,9 @@
     <bean class="com.stormpath.tooter.validator.LoginValidator"/>
 
     <!-- Register the Customer.properties -->
-    <bean id="messageProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="classpath:message.properties"/>
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="message"/>
     </bean>
-
-
 
 </beans>

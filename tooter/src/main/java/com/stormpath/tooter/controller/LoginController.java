@@ -47,6 +47,8 @@ public class LoginController {
 
         Customer cust = new Customer();
 
+        model.addAttribute("customer", cust);
+
         //return form view
         return "login";
     }
