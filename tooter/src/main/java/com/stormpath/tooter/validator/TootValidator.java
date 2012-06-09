@@ -8,21 +8,26 @@ import org.springframework.validation.Validator;
 /**
  * Created with IntelliJ IDEA.
  * User: ecrisostomo
- * Date: 6/7/12
- * Time: 11:19 AM
+ * Date: 6/8/12
+ * Time: 6:23 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LoginValidator implements Validator {
+public class TootValidator implements Validator {
+
     @Override
     public boolean supports(Class<?> clazz) {
         return Customer.class.isAssignableFrom(clazz);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
+    public void validate(Object o, Errors errors) {
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userName", "login.required.userName", "Field name is required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tootMessage", "tooter.required", "Field toot is required");
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "login.required.password", "Field password is required");
+        Customer customer = (Customer) o;
+
+        if (customer.getTootMessage() != null && customer.getTootMessage().length() > 160) {
+            errors.rejectValue("tootMessage", "tooter.too.many.chars");
+        }
     }
 }

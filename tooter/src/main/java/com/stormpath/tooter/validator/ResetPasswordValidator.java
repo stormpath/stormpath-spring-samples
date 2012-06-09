@@ -8,21 +8,19 @@ import org.springframework.validation.Validator;
 /**
  * Created with IntelliJ IDEA.
  * User: ecrisostomo
- * Date: 6/7/12
- * Time: 11:19 AM
+ * Date: 6/8/12
+ * Time: 3:46 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LoginValidator implements Validator {
+public class ResetPasswordValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
         return Customer.class.isAssignableFrom(clazz);
     }
 
     @Override
-    public void validate(Object target, Errors errors) {
+    public void validate(Object o, Errors errors) {
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userName", "login.required.userName", "Field name is required");
-
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "login.required.password", "Field password is required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "reset.password.required.email", "Field email is required");
     }
 }

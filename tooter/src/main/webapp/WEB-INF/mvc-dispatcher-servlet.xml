@@ -21,6 +21,10 @@
     </bean>
 
     <bean class="com.stormpath.tooter.validator.LoginValidator"/>
+    <bean class="com.stormpath.tooter.validator.SignUpValidator"/>
+    <bean class="com.stormpath.tooter.validator.ResetPasswordValidator"/>
+    <bean class="com.stormpath.tooter.validator.ChangePasswordValidator"/>
+    <bean class="com.stormpath.tooter.validator.TootValidator"/>
 
     <!-- Register the Customer.properties -->
     <bean id="messageSource"

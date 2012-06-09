@@ -1,7 +1,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.tooter.model.Customer;
-import com.stormpath.tooter.validator.LoginValidator;
+import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,28 +12,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
 /**
- * @since 0.1
+ * Created with IntelliJ IDEA.
+ * User: ecrisostomo
+ * Date: 6/8/12
+ * Time: 6:40 PM
+ * To change this template use File | Settings | File Templates.
  */
 @Controller
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/tooter")
+public class TootController {
 
-    private LoginValidator loginValidator;
+    TootValidator tootValidator;
 
     @Autowired
-    public LoginController(LoginValidator loginValidator) {
-        this.loginValidator = loginValidator;
+    public TootController(TootValidator tootValidator) {
+        this.tootValidator = tootValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
 
-        loginValidator.validate(customer, result);
+        tootValidator.validate(customer, result);
 
         if (result.hasErrors()) {
             //if validator failed
             //TODO: add SDK user validation
-            return "login";
+            return "tooter";
         } else {
 
             status.setComplete();
@@ -42,7 +46,7 @@ public class LoginController {
 
 
             //form success
-            return "redirect:tooter";
+            return "tooter";
         }
     }
 
@@ -54,7 +58,6 @@ public class LoginController {
         model.addAttribute("customer", cust);
 
         //return form view
-        return "login";
+        return "tooter";
     }
-
 }

@@ -4,76 +4,16 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
-    <title id="pageTitle">Login</title>
-    <style>
-        .error {
-            color: #ff0000;
-        }
-
-        .errorblock {
-            color: #000;
-            background-color: #ffEEEE;
-            border: 3px solid #ff0000;
-            padding: 8px;
-            margin: 16px;
-        }
-
-        .contentpanel {
-            margin-top: 15px;
-            background: white;
-            border: 1px solid #999;
-            padding: 20px;
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-            -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-            -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px;
-            line-height: 25px !important
-        }
-
-        .contentpanel ul {
-            list-style: disc
-        }
-
-        .contentpanel ul li {
-            line-height: 25px !important
-        }
-
-        .contentpanel ol {
-            list-style-type: decimal
-        }
-
-        .contentpanel ol li {
-            line-height: 25px !important
-        }
-
-        .contentpanel h2 {
-            font-size: 25px;
-            line-height: 30px
-        }
-
-        a.actionbutton {
-            display: inline-block;
-            padding: 5px 10px 5px 10px;
-            color: white !important;
-            text-decoration: none !important;
-            background-color: #e45a43;
-            border: 1px solid #d65543 !important;
-            -webkit-box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-            -moz-box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-            box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px
-        }
-
-
-    </style>
+    <title id="pageTitle"><spring:message code="account.login"/></title>
+    <link rel="stylesheet" href="../../assets/styles/style.css" type="text/css"/>
 </head>
 <body>
 <div class="contentpanel" element="div">
-    <form:form id="customer" action="login" modelAttribute="customer">
+    <h1><spring:message code="welcome.message"/>
+    </h1>
+    <br/>
+    <spring:message code="welcome.sample.app"/>
+    <form:form method="POST" commandName="customer">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
         <div>
@@ -86,10 +26,14 @@
         </div>
         <div id="buttons">
             <div class="login">
-                <a href="#" id="loginbutton" class="actionbutton">Log In</a>
+                <input type="submit" value="<spring:message code="account.login"/>"/>
             </div>
             <div class="help">
-                <a href="<c:url value='/forgotLogin'/>"><spring:message code="password.forgot"/></a>
+                <a href="<c:url value='/resetPassword'/>"><spring:message code="password.forgot"/></a><br>
+                <spring:message code="account.dont.have.one"/>
+                <span style="padding-left:2px">
+                    <a href="<c:url value='/singUp'/>"><spring:message code="account.signup"/></a>
+                </span>
             </div>
         </div>
     </form:form>
