@@ -1,7 +1,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.tooter.model.Customer;
-import com.stormpath.tooter.validator.SignUpValidator;
+import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,40 +14,36 @@ import org.springframework.web.bind.support.SessionStatus;
 /**
  * Created with IntelliJ IDEA.
  * User: ecrisostomo
- * Date: 6/8/12
- * Time: 11:29 AM
+ * Date: 6/11/12
+ * Time: 2:26 PM
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-@RequestMapping("/singUp")
-public class SignUpController {
+@RequestMapping("/profile")
+public class ProfileController {
 
-    SignUpValidator singUpValidator;
+    ProfileValidator profileValidator;
 
     @Autowired
-    public SignUpController(SignUpValidator signUpValidator) {
-        this.singUpValidator = signUpValidator;
+    public ProfileController(ProfileValidator profileValidator) {
+        this.profileValidator = profileValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
 
-        singUpValidator.validate(customer, result);
+        profileValidator.validate(customer, result);
 
         if (result.hasErrors()) {
             //if validator failed
             //TODO: add SDK user validation
-            return "singUp";
         } else {
 
             status.setComplete();
 
             //TODO: add redirect logic. SDK?
-
-
-            //form success
-            return "redirect:login";
         }
+        return "profile";
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -55,11 +51,15 @@ public class SignUpController {
 
         Customer cust = new Customer();
         cust.setAccountType(Customer.BASIC_ACCOUNT);
+        cust.setFirstName("Some");
+        cust.setLastName("Body");
+        cust.setUserName("somebody");
+        cust.setEmail("somebody@email.com");
+        cust.setPassword("myPassw0rd");
 
         model.addAttribute("customer", cust);
 
         //return form view
-        return "singUp";
+        return "profile";
     }
-
 }

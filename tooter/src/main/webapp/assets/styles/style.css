@@ -59,3 +59,13 @@ a.actionbutton {
     -moz-border-radius: 5px;
     border-radius: 5px
 }
+
+.Premium {
+    background-color: yellow;
+    max-width: 850px
+}
+
+.Admin {
+    background-color: blue;
+    max-width: 850px
+}

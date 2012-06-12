@@ -25,6 +25,7 @@
     <bean class="com.stormpath.tooter.validator.ResetPasswordValidator"/>
     <bean class="com.stormpath.tooter.validator.ChangePasswordValidator"/>
     <bean class="com.stormpath.tooter.validator.TootValidator"/>
+    <bean class="com.stormpath.tooter.validator.ProfileValidator"/>
 
     <!-- Register the Customer.properties -->
     <bean id="messageSource"

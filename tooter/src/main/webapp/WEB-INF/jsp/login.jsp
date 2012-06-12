@@ -9,10 +9,13 @@
 </head>
 <body>
 <div class="contentpanel" element="div">
-    <h1><spring:message code="welcome.message"/>
+    <h1>
+        <spring:message code="welcome.message"/>
     </h1>
-    <br/>
-    <spring:message code="welcome.sample.app"/>
+
+    <div>
+        <spring:message code="welcome.sample.app"/>
+    </div>
     <form:form method="POST" commandName="customer">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>

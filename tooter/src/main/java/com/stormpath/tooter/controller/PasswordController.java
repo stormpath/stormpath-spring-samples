@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
 /**
@@ -54,7 +56,8 @@ public class PasswordController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/changePassword")
-    public String processChangePassword(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    public String processChangePassword(@ModelAttribute("customer") Customer customer,
+                                        BindingResult result, SessionStatus status) {
 
         changePasswordValidator.validate(customer, result);
 
@@ -70,7 +73,7 @@ public class PasswordController {
 
 
             //form success
-            return "login";
+            return "redirect:login";
         }
     }
 
@@ -97,11 +100,18 @@ public class PasswordController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/changePassword")
-    public String initChangePassword(ModelMap model) {
+    public String initChangePassword(@RequestParam("accountId") String accountId,
+                                     @RequestParam("passToken") String passToken,
+                                     ModelMap model,
+                                     @ModelAttribute("customer") Customer cust,
+                                     BindingResult result) {
 
-        Customer cust = new Customer();
-
-        model.addAttribute("customer", cust);
+        if (accountId.isEmpty()) {
+            result.addError(new ObjectError("password", "The accountId parameter can't be empty"));
+        }
+        if (passToken.isEmpty()) {
+            result.addError(new ObjectError("password", "The passToken parameter can't be empty"));
+        }
 
         //return form view
         return "changePassword";

@@ -9,6 +9,15 @@ package com.stormpath.tooter.model;
  */
 public class Toot {
 
+    int tootId;
+
+    public int getTootId() {
+        return tootId;
+    }
+
+    public void setTootId(int tootId) {
+        this.tootId = tootId;
+    }
 
     String tootMessage;
 

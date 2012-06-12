@@ -1,6 +1,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.Toot;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,9 +34,9 @@ public class TootController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") Customer cust, BindingResult result, SessionStatus status) {
 
-        tootValidator.validate(customer, result);
+        tootValidator.validate(cust, result);
 
         if (result.hasErrors()) {
             //if validator failed
@@ -44,6 +48,26 @@ public class TootController {
 
             //TODO: add Reset Password redirect logic. SDK?
 
+            cust.setAccountType("Premium");
+            cust.setFirstName("Some");
+            cust.setLastName("Body");
+            cust.setUserName("somebody");
+
+            List<Toot> tootList = new ArrayList<Toot>();
+
+            Toot toot = new Toot();
+            toot.setTootId(1);
+            toot.setCustomer(cust);
+            toot.setTootMessage("This is one toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot!!!!!!!!!!!!!!");
+            tootList.add(toot);
+
+            toot = new Toot();
+            toot.setTootId(2);
+            toot.setCustomer(cust);
+            toot.setTootMessage("This is anooooooooooooooother tooooooooooooooooooooooooooooooooooot!!!!!!!!!");
+            tootList.add(toot);
+
+            cust.setTootList(tootList);
 
             //form success
             return "tooter";
@@ -54,6 +78,29 @@ public class TootController {
     public String initForm(ModelMap model) {
 
         Customer cust = new Customer();
+
+        cust.setAccountType("Premium");
+        cust.setFirstName("Some");
+        cust.setLastName("Body");
+        cust.setUserName("somebody");
+
+        List<Toot> tootList = new ArrayList<Toot>();
+
+        Toot toot = new Toot();
+        toot.setTootId(1);
+        toot.setCustomer(cust);
+        toot.setTootMessage("This is one toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot!!!!!!!!!!!!!!");
+        tootList.add(toot);
+
+        toot = new Toot();
+        toot.setTootId(2);
+        toot.setCustomer(cust);
+        toot.setTootMessage("This is anooooooooooooooother tooooooooooooooooooooooooooooooooooot!!!!!!!!!");
+        tootList.add(toot);
+
+        cust.setTootList(tootList);
+
+        model.addAttribute("tootList", tootList);
 
         model.addAttribute("customer", cust);
 

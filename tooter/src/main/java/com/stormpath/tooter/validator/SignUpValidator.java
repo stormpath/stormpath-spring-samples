@@ -30,7 +30,7 @@ public class SignUpValidator implements Validator {
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "signUp.required.email", "Field email is required");
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmEmail", "signUp.required.confirm.password", "Field confirm email is required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "signUp.required.confirm.password", "Field confirm password is required");
 
         Customer customer = (Customer) o;
 

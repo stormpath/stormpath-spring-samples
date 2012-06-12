@@ -1,14 +1,26 @@
 package com.stormpath.tooter.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
 
+@Entity
+@Table(name = "T_ACCOUNT")
 public class Customer {
 
+
+    public static String BASIC_ACCOUNT = "Basic";
+
+    @Id
+    Integer id;
 
     String userName;
 
     String password;
 
+    @Transient
     String confirmPassword;
 
     String firstName;
@@ -19,11 +31,19 @@ public class Customer {
 
     String email;
 
-    String confirmEmail;
-
+    @Transient
     List<Toot> tootList;
 
+    @Transient
     String tootMessage;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getTootMessage() {
         return tootMessage;
@@ -40,17 +60,6 @@ public class Customer {
     public void setTootList(List<Toot> tootList) {
         this.tootList = tootList;
     }
-
-    public String getConfirmEmail() {
-        return confirmEmail;
-    }
-
-    public void setConfirmEmail(String confirmEmail) {
-        this.confirmEmail = confirmEmail;
-    }
-
-    public static String BASIC_ACCOUNT = "Basic";
-
 
     public String getEmail() {
         return email;
