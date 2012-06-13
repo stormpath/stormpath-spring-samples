@@ -1,6 +1,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,9 @@ public class ProfileController {
     ProfileValidator profileValidator;
 
     @Autowired
+    CustomerDao customerDao;
+
+    @Autowired
     public ProfileController(ProfileValidator profileValidator) {
         this.profileValidator = profileValidator;
     }
@@ -41,7 +45,11 @@ public class ProfileController {
 
             status.setComplete();
 
-            //TODO: add redirect logic. SDK?
+            try {
+                customerDao.saveOrUpdateCustomer(customer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return "profile";
     }

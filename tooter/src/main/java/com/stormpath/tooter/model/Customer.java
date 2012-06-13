@@ -1,9 +1,6 @@
 package com.stormpath.tooter.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -14,21 +11,29 @@ public class Customer {
     public static String BASIC_ACCOUNT = "Basic";
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID")
     Integer id;
 
+    @Column(name = "userName")
     String userName;
 
+    @Column(name = "password")
     String password;
 
     @Transient
     String confirmPassword;
 
+    @Column(name = "firstName")
     String firstName;
 
+    @Column(name = "lastName")
     String lastName;
 
+    @Column(name = "accountType")
     String accountType;
 
+    @Column(name = "email")
     String email;
 
     @Transient

@@ -58,7 +58,7 @@
             <div class="${toot.customer.accountType}">
                 <a href="<c:url value='/tooter?accountId=${toot.customer.userName}'/>">${toot.customer.userName}</a>
                     ${toot.tootMessage}
-                <a href="<c:url value='/tooter?accountId=${toot.customer.userName}&removeTootId=${toot.tootId}'/>"><spring:message
+                <a href="<c:url value='/tooter/remove?accountId=${toot.customer.userName}&removeTootId=${toot.tootId}'/>"><spring:message
                         code="tooter.remove.toot"/></a>
 
                 <div style="padding-left: 650px">

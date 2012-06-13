@@ -42,16 +42,14 @@ public class LoginController {
 
 
             //form success
-            return "redirect:tooter";
+            return "redirect:/tooter?accountId=" + customer.getUserName();
         }
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String initForm(ModelMap model) {
+    public String initForm(@ModelAttribute("customer") Customer customer, BindingResult result, ModelMap model) {
 
-        Customer cust = new Customer();
-
-        model.addAttribute("customer", cust);
+        model.addAttribute("customer", customer);
 
         //return form view
         return "login";
