@@ -17,5 +17,5 @@ public interface TootDao {
 
     Toot saveToot(Toot toot) throws Exception;
 
-    void removeToot(Toot toot) throws Exception;
+    void removeTootById(Integer tootId) throws Exception;
 }

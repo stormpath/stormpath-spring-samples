@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * Created with IntelliJ IDEA.
  * User: ecrisostomo
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class LogoutController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String logout() {
+    public String logout(HttpSession session) {
+        session.invalidate();
         return "logout";
     }
 }

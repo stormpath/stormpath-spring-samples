@@ -1,6 +1,6 @@
 package com.stormpath.tooter.validator;
 
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.Toot;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -16,7 +16,7 @@ public class TootValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return Customer.class.isAssignableFrom(clazz);
+        return Toot.class.isAssignableFrom(clazz);
     }
 
     @Override
@@ -24,9 +24,9 @@ public class TootValidator implements Validator {
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tootMessage", "tooter.required", "Field toot is required");
 
-        Customer customer = (Customer) o;
+        Toot toot = (Toot) o;
 
-        if (customer.getTootMessage() != null && customer.getTootMessage().length() > 160) {
+        if (toot.getTootMessage() != null && toot.getTootMessage().length() > 160) {
             errors.rejectValue("tootMessage", "tooter.too.many.chars");
         }
     }

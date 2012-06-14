@@ -5,12 +5,16 @@ import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,6 +25,7 @@ import org.springframework.web.bind.support.SessionStatus;
  */
 @Controller
 @RequestMapping("/profile")
+@Transactional(propagation = Propagation.REQUIRED)
 public class ProfileController {
 
     ProfileValidator profileValidator;
@@ -28,13 +33,19 @@ public class ProfileController {
     @Autowired
     CustomerDao customerDao;
 
+    public ProfileController() {
+    }
+
     @Autowired
     public ProfileController(ProfileValidator profileValidator) {
         this.profileValidator = profileValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") Customer customer,
+                                BindingResult result,
+                                SessionStatus status,
+                                HttpSession session) {
 
         profileValidator.validate(customer, result);
 
@@ -46,7 +57,8 @@ public class ProfileController {
             status.setComplete();
 
             try {
-                customerDao.saveOrUpdateCustomer(customer);
+                Customer cust = customerDao.saveOrUpdateCustomer(customer);
+                session.setAttribute("sessionCustomer", cust);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,15 +67,17 @@ public class ProfileController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String initForm(ModelMap model) {
+    public String initForm(ModelMap model, HttpSession session) {
 
-        Customer cust = new Customer();
-        cust.setAccountType(Customer.BASIC_ACCOUNT);
-        cust.setFirstName("Some");
-        cust.setLastName("Body");
-        cust.setUserName("somebody");
-        cust.setEmail("somebody@email.com");
-        cust.setPassword("myPassw0rd");
+
+        Customer cust = (Customer) session.getAttribute("sessionCustomer");
+        ;
+
+        try {
+            cust = customerDao.getCustomerByUserName(cust.getUserName());
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
         model.addAttribute("customer", cust);
 

@@ -1,16 +1,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/mvc
-    http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
     <context:component-scan base-package="com.stormpath.tooter"/>
     <mvc:annotation-driven/>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
     <mvc:default-servlet-handler/>
 
     <mvc:view-controller path="/" view-name="redirect:/login"/>
@@ -27,10 +28,19 @@
     <bean class="com.stormpath.tooter.validator.TootValidator"/>
     <bean class="com.stormpath.tooter.validator.ProfileValidator"/>
 
-    <!-- Register the Customer.properties -->
+    <!-- Register the *.properties -->
     <bean id="messageSource"
           class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basename" value="message"/>
+    </bean>
+
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:application.properties</value>
+            </list>
+        </property>
     </bean>
 
     <!-- DABASE CONFIGURATION -->
@@ -70,6 +80,26 @@
     <!-- Hibernate transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Stormpath SDK      -->
+
+    <bean name="apiKey" class="com.stormpath.sdk.client.DefaultApiKey">
+        <constructor-arg index="0">
+            <value type="java.lang.String">${stormpath.sdk.accessId}</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value type="java.lang.String">${stormpath.sdk.secretKey}</value>
+        </constructor-arg>
+    </bean>
+
+    <bean name="sdkClient" class="com.stormpath.sdk.client.Client">
+        <constructor-arg index="0">
+            <ref bean="apiKey"/>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value type="java.lang.String">${stormpath.sdk.url}</value>
+        </constructor-arg>
     </bean>
 
 </beans>

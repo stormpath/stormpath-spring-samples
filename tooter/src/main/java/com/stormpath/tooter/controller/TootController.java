@@ -7,6 +7,8 @@ import com.stormpath.tooter.model.dao.TootDao;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class TootController {
 
     TootValidator tootValidator;
@@ -36,15 +40,21 @@ public class TootController {
     @Autowired
     CustomerDao customerDao;
 
+    public TootController() {
+    }
+
     @Autowired
     public TootController(TootValidator tootValidator) {
         this.tootValidator = tootValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/tooter")
-    public String processSubmit(@ModelAttribute("customer") Customer cust, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("toot") Toot toot,
+                                BindingResult result,
+                                SessionStatus status,
+                                HttpSession session) {
 
-        tootValidator.validate(cust, result);
+        tootValidator.validate(toot, result);
 
         if (result.hasErrors()) {
             //if validator failed
@@ -52,25 +62,32 @@ public class TootController {
             return "tooter";
         } else {
 
-            status.setComplete();
+            Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
+            Customer persistCustomer = new Customer();
+            persistCustomer.setId(sessionCustomer.getId());
 
             //TODO: add Reset Password redirect logic. SDK?
 
-            Toot tooot = new Toot();
-            tooot.setTootMessage(cust.getTootMessage());
-            tooot.setCustomer(cust);
 
             List<Toot> tootList = new ArrayList<Toot>();
+            Toot persistToot = new Toot();
+            persistToot.setTootMessage(toot.getTootMessage());
+            persistToot.setCustomer(persistCustomer);
 
             try {
-                tootDao.saveToot(tooot);
-                tootList = tootDao.getTootsByUserId(cust.getId());
+
+                tootDao.saveToot(persistToot);
+                tootList = tootDao.getTootsByUserId(persistCustomer.getId());
+                sessionCustomer.setTootList(tootList);
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
-            cust.setTootMessage("");
-            cust.setTootList(tootList);
+            toot.setTootMessage("");
+            toot.setCustomer(sessionCustomer);
+
+            status.setComplete();
+
 
             //form success
             return "tooter";
@@ -80,22 +97,33 @@ public class TootController {
     @RequestMapping(method = RequestMethod.GET, value = "/tooter")
     public String initForm(@RequestParam("accountId") String userName,
                            ModelMap model,
-                           @ModelAttribute("customer") Customer cust,
-                           BindingResult result) {
+                           @ModelAttribute("toot") Toot toot,
+                           BindingResult result,
+                           HttpSession session) {
 
         List<Toot> tootList = new ArrayList<Toot>();
 
-        Customer customer = new Customer();
+        Toot tooot = new Toot();
 
         try {
-            customer = customerDao.getCustomerByUserName(userName);
-            tootList = tootDao.getTootsByUserId(customer.getId());
+            Object accountIdAtt = session.getAttribute("accountId");
+            String accountId = accountIdAtt == null ? userName : (String) accountIdAtt;
+            session.removeAttribute("accountId");
+
+            Object sessionCustObj = session.getAttribute("sessionCustomer");
+            Integer custId = sessionCustObj == null ? 0 : ((Customer) sessionCustObj).getId();
+
+            Customer customer = customerDao.getCustomerByUserName(accountId);
+            session.setAttribute("sessionCustomer", customer);
+
+            tootList = tootDao.getTootsByUserId(custId > 0 ? custId : customer.getId());
+            customer.setTootList(tootList);
+            tooot.setCustomer(customer);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        model.addAttribute("tootList", tootList);
 
-        model.addAttribute("customer", customer);
+        model.addAttribute("toot", tooot);
 
         //return form view
         return "tooter";
@@ -105,33 +133,18 @@ public class TootController {
     public String removeToot(@RequestParam("accountId") String userName,
                              @RequestParam("removeTootId") String removeTootId,
                              ModelMap model,
-                             @ModelAttribute("customer") Customer cust) {
+                             @ModelAttribute("Toot") Toot toot,
+                             HttpSession session) {
 
-
-        Toot toot = new Toot();
-        toot.setTootId(Integer.valueOf(removeTootId));
 
         try {
-            tootDao.removeToot(toot);
+            tootDao.removeTootById(Integer.valueOf(removeTootId));
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        List<Toot> tootList = new ArrayList<Toot>();
-        Customer customer = new Customer();
-
-        try {
-            customer = customerDao.getCustomerByUserName(userName);
-            tootList = tootDao.getTootsByUserId(customer.getId());
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        model.addAttribute("tootList", tootList);
-
-        model.addAttribute("customer", customer);
 
         //return form view
-        return "redirect:/tooter";
+        return "redirect:/tooter?accountId=" + userName;
     }
 }

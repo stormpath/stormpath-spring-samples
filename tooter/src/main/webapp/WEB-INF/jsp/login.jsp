@@ -16,9 +16,14 @@
     <div>
         <spring:message code="welcome.sample.app"/>
     </div>
-    <form:form method="POST" commandName="customer">
+    <form:form method="POST" commandName="customer" action="/login">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
+        <c:if test="${not empty messageKey}">
+            <div style="padding-bottom: 10px; padding-top: 10px; font-size: 14px; background-color: #9acd32; width: auto;">
+                <spring:message code="login.message.${messageKey}"/>
+            </div>
+        </c:if>
         <div>
             <label for="userName"><spring:message code="customer.userName"/></label>
             <form:input id="userName" path="userName"/>

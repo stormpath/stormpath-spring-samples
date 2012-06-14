@@ -27,22 +27,23 @@
 
     <span style="padding-left: 400px">
         <label><spring:message code="customer.account.type"/>:</label>
-        <a href="#" onclick="return showWindow()">${customer.accountType}</a>
+        <a href="#" onclick="return showWindow()">${toot.customer.accountType}</a>
      </span>
      <span style="padding-left: 25px">
-         <input type=button name=type value='${customer.firstName} ${customer.lastName}'
+         <input type=button name=type value='${toot.customer.firstName} ${toot.customer.lastName}'
                 onclick="setVisibility('accOptions');">
      </span>
     <br/>
     <spring:message code="welcome.sample.app"/>
 
     <div id="accOptions" style="display:none; padding-left: 462px">
-        <a href="<c:url value='/profile?accountId=${customer.userName}'/>"><spring:message code="profile.title"/></a>
+        <a href="<c:url value='/profile?accountId=${toot.customer.userName}'/>"><spring:message
+                code="profile.title"/></a>
 
         <div style="padding-left: 640px"><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a>
         </div>
     </div>
-    <form:form method="POST" commandName="customer">
+    <form:form method="POST" commandName="toot">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
         <div>
@@ -54,15 +55,15 @@
         <br/>
         <spring:message code="tooter.toots"/>
         <br/>
-        <c:forEach items="${customer.tootList}" var="toot">
-            <div class="${toot.customer.accountType}">
-                <a href="<c:url value='/tooter?accountId=${toot.customer.userName}'/>">${toot.customer.userName}</a>
-                    ${toot.tootMessage}
-                <a href="<c:url value='/tooter/remove?accountId=${toot.customer.userName}&removeTootId=${toot.tootId}'/>"><spring:message
-                        code="tooter.remove.toot"/></a>
+        <c:forEach items="${toot.customer.tootList}" var="tootItem">
+            <div class="${tootItem.customer.accountType}">
+                <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
+                    ${tootItem.tootMessage}
+                <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>">
+                    <spring:message code="tooter.remove.toot"/></a>
 
                 <div style="padding-left: 650px">
-                        ${toot.customer.accountType} <spring:message code="customer.account"/>
+                        ${tootItem.customer.accountType} <spring:message code="customer.account"/>
                 </div>
             </div>
             <br/>

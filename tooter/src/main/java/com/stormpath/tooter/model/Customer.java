@@ -39,23 +39,12 @@ public class Customer {
     @Transient
     List<Toot> tootList;
 
-    @Transient
-    String tootMessage;
-
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getTootMessage() {
-        return tootMessage;
-    }
-
-    public void setTootMessage(String tootMessage) {
-        this.tootMessage = tootMessage;
     }
 
     public List<Toot> getTootList() {

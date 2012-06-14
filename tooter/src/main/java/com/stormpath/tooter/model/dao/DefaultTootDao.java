@@ -1,11 +1,13 @@
 package com.stormpath.tooter.model.dao;
 
 import com.stormpath.tooter.model.Toot;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,14 +18,26 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Repository
-public class DefaultTootDao extends HibernateDaoSupport implements TootDao {
+public class DefaultTootDao extends BaseHibernateDao implements TootDao {
 
     @Override
     public List<Toot> getTootsByUserId(int custId) throws Exception {
 
 
-        //return getHibernateTemplate().find("from Toot t where t.customer.id=:tootId", custId);
-        return getHibernateTemplate().find("from Toot");
+        Criteria criteria = getSession().createCriteria(Toot.class);
+        criteria.add(Restrictions.eq("customer.id", custId));
+        List<?> list = new ArrayList<Object>();
+        list.addAll(criteria.list());
+
+        List<Toot> tootList = new ArrayList<Toot>(list.size());
+
+        for (Object obj : list) {
+            if (obj != null) {
+                tootList.add((Toot) obj);
+            }
+        }
+
+        return tootList;
     }
 
     @Override
@@ -35,8 +49,8 @@ public class DefaultTootDao extends HibernateDaoSupport implements TootDao {
     }
 
     @Override
-    public void removeToot(Toot toot) throws Exception {
-        getHibernateTemplate().delete(toot);
+    public void removeTootById(Integer tootId) throws Exception {
+        deleteById(Toot.class, Integer.valueOf(tootId));
     }
 
     @Autowired

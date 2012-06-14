@@ -9,7 +9,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * @since 0.1
@@ -26,7 +29,10 @@ public class LoginController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") Customer customer,
+                                BindingResult result,
+                                SessionStatus status,
+                                HttpSession session) {
 
         loginValidator.validate(customer, result);
 
@@ -40,7 +46,7 @@ public class LoginController {
 
             //TODO: add Reset Password redirect logic. SDK?
 
-
+            session.setAttribute("accountId", customer.getUserName());
             //form success
             return "redirect:/tooter?accountId=" + customer.getUserName();
         }
@@ -50,6 +56,19 @@ public class LoginController {
     public String initForm(@ModelAttribute("customer") Customer customer, BindingResult result, ModelMap model) {
 
         model.addAttribute("customer", customer);
+
+        //return form view
+        return "login";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/message")
+    public String initMessage(@RequestParam("loginMsg") String messageKey,
+                              @ModelAttribute("customer") Customer customer,
+                              BindingResult result,
+                              ModelMap model) {
+
+        model.addAttribute("customer", customer);
+        model.addAttribute("messageKey", messageKey);
 
         //return form view
         return "login";

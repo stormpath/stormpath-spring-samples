@@ -5,6 +5,8 @@ import com.stormpath.tooter.validator.ChangePasswordValidator;
 import com.stormpath.tooter.validator.ResetPasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -22,11 +24,15 @@ import org.springframework.web.bind.support.SessionStatus;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
+@Transactional(propagation = Propagation.REQUIRED)
 public class PasswordController {
 
     ChangePasswordValidator changePasswordValidator;
 
     ResetPasswordValidator resetPasswordValidator;
+
+    public PasswordController() {
+    }
 
     @Autowired
     public PasswordController(ChangePasswordValidator changePasswordValidator, ResetPasswordValidator resetPasswordValidator) {
@@ -73,7 +79,7 @@ public class PasswordController {
 
 
             //form success
-            return "redirect:login";
+            return "redirect:/login/message?loginMsg=passChanged";
         }
     }
 

@@ -5,6 +5,8 @@ import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.validator.SignUpValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,12 +23,16 @@ import org.springframework.web.bind.support.SessionStatus;
  */
 @Controller
 @RequestMapping("/singUp")
+@Transactional(propagation = Propagation.REQUIRED)
 public class SignUpController {
 
     @Autowired
     CustomerDao customerDao;
 
     SignUpValidator singUpValidator;
+
+    public SignUpController() {
+    }
 
     @Autowired
     public SignUpController(SignUpValidator signUpValidator) {
@@ -48,14 +54,6 @@ public class SignUpController {
 
             //TODO: add redirect logic. SDK?
 
-            /*Customer cust = new Customer();
-            cust.setUserName(customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase());
-            cust.setAccountType(customer.getAccountType());
-            cust.setEmail(customer.getEmail());
-            cust.setFirstName(customer.getFirstName());
-            cust.setLastName(customer.getLastName());
-            cust.setPassword(customer.getPassword());*/
-
             try {
                 customer.setUserName(customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase());
                 customerDao.saveOrUpdateCustomer(customer);
@@ -64,7 +62,7 @@ public class SignUpController {
             }
 
             //form success
-            return "redirect:login";
+            return "redirect:/login/message?loginMsg=registered";
         }
     }
 
