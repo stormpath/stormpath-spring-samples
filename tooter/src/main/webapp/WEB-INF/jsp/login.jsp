@@ -20,7 +20,7 @@
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
         <c:if test="${not empty messageKey}">
-            <div style="padding-bottom: 10px; padding-top: 10px; font-size: 14px; background-color: #9acd32; width: auto;">
+            <div class="messageblock">
                 <spring:message code="login.message.${messageKey}"/>
             </div>
         </c:if>
@@ -40,7 +40,7 @@
                 <a href="<c:url value='/resetPassword'/>"><spring:message code="password.forgot"/></a><br>
                 <spring:message code="account.dont.have.one"/>
                 <span style="padding-left:2px">
-                    <a href="<c:url value='/singUp'/>"><spring:message code="account.signup"/></a>
+                    <a href="<c:url value='/signUp'/>"><spring:message code="account.signup"/></a>
                 </span>
             </div>
         </div>

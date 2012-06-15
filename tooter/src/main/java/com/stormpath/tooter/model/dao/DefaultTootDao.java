@@ -43,8 +43,7 @@ public class DefaultTootDao extends BaseHibernateDao implements TootDao {
     @Override
     public Toot saveToot(Toot toot) throws Exception {
 
-        getHibernateTemplate().save(toot);
-
+        save(toot);
         return toot;
     }
 

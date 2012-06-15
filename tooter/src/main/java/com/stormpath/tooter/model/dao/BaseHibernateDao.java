@@ -25,4 +25,12 @@ public class BaseHibernateDao extends HibernateDaoSupport {
     public <T> T load(Class<T> entityClass, Serializable id) throws DataAccessException {
         return getHibernateTemplate().load(entityClass, id);
     }
+
+    public void update(Object entity) throws DataAccessException {
+        getHibernateTemplate().update(entity);
+    }
+
+    public Serializable save(Object entity) throws DataAccessException {
+        return getHibernateTemplate().save(entity);
+    }
 }

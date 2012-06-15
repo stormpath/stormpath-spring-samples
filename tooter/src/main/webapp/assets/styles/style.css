@@ -10,6 +10,14 @@
     margin: 16px;
 }
 
+.messageblock {
+    color: #000;
+    background-color: #98fb98;
+    border: 3px solid green;
+    padding: 8px;
+    margin: 16px;
+}
+
 .contentpanel {
     margin-top: 15px;
     background: white;
@@ -43,21 +51,6 @@
 .contentpanel h2 {
     font-size: 25px;
     line-height: 30px
-}
-
-a.actionbutton {
-    display: inline-block;
-    padding: 5px 10px 5px 10px;
-    color: white !important;
-    text-decoration: none !important;
-    background-color: #e45a43;
-    border: 1px solid #d65543 !important;
-    -webkit-box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-    -moz-box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-    box-shadow: 1px 1px 2px 1px rgba(135, 117, 115, 0.75);
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px
 }
 
 .Premium {

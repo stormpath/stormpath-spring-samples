@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/profile")
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class ProfileController {
 
     ProfileValidator profileValidator;
@@ -45,7 +45,8 @@ public class ProfileController {
     public String processSubmit(@ModelAttribute("customer") Customer customer,
                                 BindingResult result,
                                 SessionStatus status,
-                                HttpSession session) {
+                                HttpSession session,
+                                ModelMap model) {
 
         profileValidator.validate(customer, result);
 
@@ -54,14 +55,30 @@ public class ProfileController {
             //TODO: add SDK user validation
         } else {
 
-            status.setComplete();
-
             try {
-                Customer cust = customerDao.saveOrUpdateCustomer(customer);
-                session.setAttribute("sessionCustomer", cust);
+                Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
+
+                sessionCustomer.setAccountType(customer.getAccountType());
+                sessionCustomer.setEmail(customer.getEmail());
+                sessionCustomer.setFirstName(customer.getFirstName());
+                sessionCustomer.setLastName(customer.getLastName());
+                sessionCustomer.setPassword(customer.getPassword());
+
+                customer = customerDao.updateCustomer(new Customer(sessionCustomer));
+
+                customer.setUserName(sessionCustomer.getUserName());
+                customer.setTootList(sessionCustomer.getTootList());
+
+                model.addAttribute("customer", customer);
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            status.setComplete();
+
+
         }
         return "profile";
     }
@@ -70,18 +87,11 @@ public class ProfileController {
     public String initForm(ModelMap model, HttpSession session) {
 
 
-        Customer cust = (Customer) session.getAttribute("sessionCustomer");
-        ;
+        Customer customer = (Customer) session.getAttribute("sessionCustomer");
 
-        try {
-            cust = customerDao.getCustomerByUserName(cust.getUserName());
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        model.addAttribute("customer", cust);
+        model.addAttribute("customer", customer);
 
         //return form view
-        return "profile";
+        return customer == null ? "redirect:/login/message?loginMsg=loginRequired" : "profile";
     }
 }

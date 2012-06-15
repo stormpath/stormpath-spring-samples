@@ -5,7 +5,6 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Repository
-public class DefaultCustomerDao extends HibernateDaoSupport implements CustomerDao {
+public class DefaultCustomerDao extends BaseHibernateDao implements CustomerDao {
 
 
     @Override
@@ -30,7 +29,7 @@ public class DefaultCustomerDao extends HibernateDaoSupport implements CustomerD
         List<?> list = new ArrayList<Object>();
         list.addAll(criteria.list());
 
-        Customer customer = new Customer();
+        Customer customer = null;
 
         if (!list.isEmpty()) {
             for (Object obj : list) {
@@ -44,9 +43,16 @@ public class DefaultCustomerDao extends HibernateDaoSupport implements CustomerD
     }
 
     @Override
-    public Customer saveOrUpdateCustomer(Customer customer) throws Exception {
+    public Customer saveCustomer(Customer customer) throws Exception {
 
-        getHibernateTemplate().saveOrUpdate(customer);
+        save(customer);
+        return customer;
+    }
+
+    @Override
+    public Customer updateCustomer(Customer customer) throws Exception {
+
+        update(customer);
 
         return customer;
     }

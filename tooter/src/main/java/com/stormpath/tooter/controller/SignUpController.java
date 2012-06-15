@@ -1,7 +1,12 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.directory.Directory;
+import com.stormpath.sdk.ds.DataStore;
+import com.stormpath.sdk.resource.ResourceException;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
+import com.stormpath.tooter.model.sdk.StormpathSDKService;
 import com.stormpath.tooter.validator.SignUpValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,14 +28,18 @@ import org.springframework.web.bind.support.SessionStatus;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-@RequestMapping("/singUp")
-@Transactional(propagation = Propagation.REQUIRED)
+@RequestMapping("/signUp")
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class SignUpController {
 
     @Autowired
     CustomerDao customerDao;
 
     SignUpValidator singUpValidator;
+
+    @Autowired
+    StormpathSDKService stormpathSDKService;
+
 
     public SignUpController() {
     }
@@ -47,7 +57,7 @@ public class SignUpController {
         if (result.hasErrors()) {
             //if validator failed
             //TODO: add SDK user validation
-            return "singUp";
+            return "signUp";
         } else {
 
             status.setComplete();
@@ -55,8 +65,30 @@ public class SignUpController {
             //TODO: add redirect logic. SDK?
 
             try {
-                customer.setUserName(customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase());
-                customerDao.saveOrUpdateCustomer(customer);
+
+                String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
+
+                DataStore dataStore = stormpathSDKService.getStormpathSDKClient().getDataStore();
+
+                Directory directory = dataStore.load(stormpathSDKService.getRestURL(), Directory.class);
+
+                Account account = dataStore.instantiate(Account.class);
+
+                account.setEmail(customer.getEmail());
+                account.setGivenName(customer.getFirstName());
+                account.setSurname(customer.getLastName());
+                account.setPassword(customer.getPassword());
+                account.setUsername(userName);
+
+                directory.createAccount(account);
+
+                customer.setUserName(userName);
+                customerDao.saveCustomer(customer);
+            } catch (ResourceException re) {
+                result.addError(new ObjectError("password", re.getMessage()));
+                re.printStackTrace();
+                return "signUp";
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,7 +107,7 @@ public class SignUpController {
         model.addAttribute("customer", cust);
 
         //return form view
-        return "singUp";
+        return "signUp";
     }
 
 }

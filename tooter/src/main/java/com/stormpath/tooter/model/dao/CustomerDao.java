@@ -13,5 +13,7 @@ public interface CustomerDao {
 
     Customer getCustomerByUserName(String userName) throws Exception;
 
-    Customer saveOrUpdateCustomer(Customer customer) throws Exception;
+    Customer saveCustomer(Customer customer) throws Exception;
+
+    Customer updateCustomer(Customer customer) throws Exception;
 }

@@ -24,7 +24,7 @@ import org.springframework.web.bind.support.SessionStatus;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PasswordController {
 
     ChangePasswordValidator changePasswordValidator;

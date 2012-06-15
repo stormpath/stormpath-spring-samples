@@ -36,7 +36,7 @@
         </div>
         <div id="buttons">
             <div class="help">
-                <a href="<c:url value='/tooter?accountId=${toot.customer.userName}'/>"><spring:message
+                <a href="<c:url value='/tooter?accountId=${customer.userName}'/>"><spring:message
                         code="profile.back"/></a>
                 <span style="padding-left:2px">
                    <input type="submit" value="<spring:message code="profile.update"/>"/>

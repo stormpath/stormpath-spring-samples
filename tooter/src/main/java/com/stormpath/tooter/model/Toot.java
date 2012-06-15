@@ -1,6 +1,7 @@
 package com.stormpath.tooter.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "T_TOOT")
-public class Toot {
+public class Toot implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

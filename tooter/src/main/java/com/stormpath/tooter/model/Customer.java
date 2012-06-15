@@ -1,11 +1,12 @@
 package com.stormpath.tooter.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "T_ACCOUNT")
-public class Customer {
+public class Customer implements Serializable {
 
 
     public static String BASIC_ACCOUNT = "Basic";
@@ -38,6 +39,23 @@ public class Customer {
 
     @Transient
     List<Toot> tootList;
+
+    public Customer() {
+    }
+
+    public Customer(Customer customer) {
+        if (customer != null) {
+            setAccountType(customer.getAccountType());
+            setConfirmPassword(customer.getConfirmPassword());
+            setEmail(customer.getEmail());
+            setFirstName(customer.getFirstName());
+            setId(customer.getId());
+            setLastName(customer.getLastName());
+            setPassword(customer.getPassword());
+            setTootList(customer.getTootList());
+            setUserName(customer.getUserName());
+        }
+    }
 
     public Integer getId() {
         return id;

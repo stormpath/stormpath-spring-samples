@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,13 +62,12 @@ public class TootController {
         } else {
 
             Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
-            Customer persistCustomer = new Customer();
-            persistCustomer.setId(sessionCustomer.getId());
+            Customer persistCustomer = new Customer(sessionCustomer);
 
             //TODO: add Reset Password redirect logic. SDK?
 
 
-            List<Toot> tootList = new ArrayList<Toot>();
+            List<Toot> tootList;
             Toot persistToot = new Toot();
             persistToot.setTootMessage(toot.getTootMessage());
             persistToot.setCustomer(persistCustomer);
@@ -77,6 +75,7 @@ public class TootController {
             try {
 
                 tootDao.saveToot(persistToot);
+                toot.setTootId(persistToot.getTootId());
                 tootList = tootDao.getTootsByUserId(persistCustomer.getId());
                 sessionCustomer.setTootList(tootList);
             } catch (Exception e) {
@@ -101,22 +100,24 @@ public class TootController {
                            BindingResult result,
                            HttpSession session) {
 
-        List<Toot> tootList = new ArrayList<Toot>();
+        List<Toot> tootList;
 
         Toot tooot = new Toot();
 
         try {
-            Object accountIdAtt = session.getAttribute("accountId");
-            String accountId = accountIdAtt == null ? userName : (String) accountIdAtt;
-            session.removeAttribute("accountId");
 
-            Object sessionCustObj = session.getAttribute("sessionCustomer");
-            Integer custId = sessionCustObj == null ? 0 : ((Customer) sessionCustObj).getId();
+            Object objCustomer = session.getAttribute("sessionCustomer");
+            Customer customer = null;
 
-            Customer customer = customerDao.getCustomerByUserName(accountId);
-            session.setAttribute("sessionCustomer", customer);
+            if (objCustomer == null) {
 
-            tootList = tootDao.getTootsByUserId(custId > 0 ? custId : customer.getId());
+                customer = customerDao.getCustomerByUserName(userName);
+            } else {
+
+                customer = (Customer) objCustomer;
+            }
+
+            tootList = tootDao.getTootsByUserId(customer.getId());
             customer.setTootList(tootList);
             tooot.setCustomer(customer);
         } catch (Exception e) {
@@ -139,6 +140,9 @@ public class TootController {
 
         try {
             tootDao.removeTootById(Integer.valueOf(removeTootId));
+            userName = userName == null || userName.isEmpty() ?
+                    ((Customer) session.getAttribute("sessionCustomer")).getUserName() :
+                    userName;
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
