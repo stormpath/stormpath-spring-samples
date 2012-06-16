@@ -33,7 +33,7 @@
             <form:password id="password" path="password"/>
         </div>
         <div id="buttons">
-            <div class="login">
+            <div class="login" style="padding-left: 150px">
                 <input type="submit" value="<spring:message code="account.login"/>"/>
             </div>
             <div class="help">

@@ -1,7 +1,10 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.application.Application;
+import com.stormpath.sdk.authc.UsernamePasswordRequest;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
+import com.stormpath.tooter.model.sdk.StormpathSDKService;
 import com.stormpath.tooter.validator.LoginValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +32,9 @@ public class LoginController {
     CustomerDao customerDao;
 
     @Autowired
+    StormpathSDKService stormpathSDKService;
+
+    @Autowired
     public LoginController(LoginValidator loginValidator) {
         this.loginValidator = loginValidator;
     }
@@ -44,30 +50,46 @@ public class LoginController {
         String returnStr;
 
         if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
             returnStr = "login";
         } else {
 
             status.setComplete();
 
-            //TODO: add Reset Password redirect logic. SDK?
-
 
             Customer dbCustomer = null;
 
             try {
+
                 dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
             if (dbCustomer != null) {
-                session.setAttribute("sessionCustomer", dbCustomer);
-                returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
+
+                try {
+                    Application application = stormpathSDKService.
+                            getDataStore().
+                            load(stormpathSDKService.
+                                    getTooterApplicationURL(), Application.class);
+
+
+                    application.authenticate(new UsernamePasswordRequest(dbCustomer.getUserName(), dbCustomer.getPassword()));
+
+                    session.setAttribute("sessionCustomer", dbCustomer);
+
+                    returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
+                } catch (RuntimeException re) {
+
+                    result.addError(new ObjectError("userName", re.getMessage()));
+                    re.printStackTrace();
+                    returnStr = "login";
+
+                }
+
             } else {
 
-                result.addError(new ObjectError("userName", "The user with Username '" + customer.getUserName() + "' could not be logged in."));
+                result.addError(new ObjectError("userName", "The user with Username '" + customer.getUserName() + "' does not exist."));
                 returnStr = "login";
             }
 

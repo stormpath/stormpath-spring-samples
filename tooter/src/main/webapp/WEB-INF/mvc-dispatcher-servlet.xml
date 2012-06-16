@@ -44,9 +44,9 @@
         <property name="username" value="SA"/>
         <property name="password" value=""/>
         <property name="initialSize" value="1"/>
-        <property name="maxActive" value="5"/>
+        <property name="maxActive" value="30"/>
         <property name="poolPreparedStatements" value="true"/>
-        <property name="maxOpenPreparedStatements" value="10"/>
+        <property name="maxOpenPreparedStatements" value="100"/>
     </bean>
     <!-- Hibernate Session Factory  -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">

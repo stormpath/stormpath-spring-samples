@@ -29,10 +29,12 @@
         <label><spring:message code="customer.account.type"/>:</label>
         <a href="#" onclick="return showWindow()">${toot.customer.accountType}</a>
      </span>
-     <span style="padding-left: 25px">
-         <input type=button name=type value='${toot.customer.firstName} ${toot.customer.lastName}'
-                onclick="setVisibility('accOptions');">
-     </span>
+    <c:if test="${not empty sessionScope.sessionCustomer}">
+         <span style="padding-left: 25px">
+             <input type=button name=type value='${toot.customer.firstName} ${toot.customer.lastName}'
+                    onclick="setVisibility('accOptions');">
+         </span>
+    </c:if>
     <br/>
     <spring:message code="welcome.sample.app"/>
 
@@ -46,22 +48,30 @@
     <form:form method="POST" commandName="toot">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
-        <div>
-            <form:input id="tootMessage" path="tootMessage" cssStyle="height: 50px; width: 700px; font-size: 14px;"
-                        maxlength="160"/>
-            <input type="submit" value="<spring:message code="tooter.toot"/>"
-                   style="height: 400px; width: 70px; font-size: 18px"/>
-        </div>
+        <c:if test="${not empty sessionScope.sessionCustomer}">
+            <div>
+                <form:input id="tootMessage" path="tootMessage" cssStyle="height: 50px; width: 700px; font-size: 14px;"
+                            maxlength="160"/>
+                <input type="submit" value="<spring:message code="tooter.toot"/>"
+                       style="height: 400px; width: 70px; font-size: 18px"/>
+            </div>
+        </c:if>
         <br/>
         <spring:message code="tooter.toots"/>
         <br/>
         <c:forEach items="${toot.customer.tootList}" var="tootItem">
             <div class="${tootItem.customer.accountType}">
-                <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
-                    ${tootItem.tootMessage}
-                <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>">
-                    <spring:message code="tooter.remove.toot"/></a>
-
+                <c:choose>
+                    <c:when test="${not empty sessionScope.sessionCustomer}">
+                        <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
+                        ${tootItem.tootMessage}
+                        <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>">
+                            <spring:message code="tooter.remove.toot"/></a>
+                    </c:when>
+                    <c:otherwise>
+                        ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}
+                    </c:otherwise>
+                </c:choose>
                 <div style="padding-left: 650px">
                         ${tootItem.customer.accountType} <spring:message code="customer.account"/>
                 </div>

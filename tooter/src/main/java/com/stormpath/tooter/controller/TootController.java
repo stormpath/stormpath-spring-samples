@@ -4,6 +4,7 @@ import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.Toot;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.dao.TootDao;
+import com.stormpath.tooter.model.sdk.StormpathSDKService;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +40,9 @@ public class TootController {
 
     @Autowired
     CustomerDao customerDao;
+
+    @Autowired
+    StormpathSDKService stormpathSDKService;
 
     public TootController() {
     }
@@ -77,6 +82,7 @@ public class TootController {
                 tootDao.saveToot(persistToot);
                 toot.setTootId(persistToot.getTootId());
                 tootList = tootDao.getTootsByUserId(persistCustomer.getId());
+                Collections.sort(tootList);
                 sessionCustomer.setTootList(tootList);
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -107,7 +113,7 @@ public class TootController {
         try {
 
             Object objCustomer = session.getAttribute("sessionCustomer");
-            Customer customer = null;
+            Customer customer;
 
             if (objCustomer == null) {
 
@@ -118,6 +124,7 @@ public class TootController {
             }
 
             tootList = tootDao.getTootsByUserId(customer.getId());
+            Collections.sort(tootList);
             customer.setTootList(tootList);
             tooot.setCustomer(customer);
         } catch (Exception e) {

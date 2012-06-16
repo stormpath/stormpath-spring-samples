@@ -2,8 +2,6 @@ package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.directory.Directory;
-import com.stormpath.sdk.ds.DataStore;
-import com.stormpath.sdk.resource.ResourceException;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathSDKService;
@@ -68,11 +66,7 @@ public class SignUpController {
 
                 String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
 
-                DataStore dataStore = stormpathSDKService.getStormpathSDKClient().getDataStore();
-
-                Directory directory = dataStore.load(stormpathSDKService.getRestURL(), Directory.class);
-
-                Account account = dataStore.instantiate(Account.class);
+                Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
 
                 account.setEmail(customer.getEmail());
                 account.setGivenName(customer.getFirstName());
@@ -80,11 +74,12 @@ public class SignUpController {
                 account.setPassword(customer.getPassword());
                 account.setUsername(userName);
 
+                Directory directory = stormpathSDKService.getDirectory();
                 directory.createAccount(account);
 
                 customer.setUserName(userName);
                 customerDao.saveCustomer(customer);
-            } catch (ResourceException re) {
+            } catch (RuntimeException re) {
                 result.addError(new ObjectError("password", re.getMessage()));
                 re.printStackTrace();
                 return "signUp";

@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "T_TOOT")
-public class Toot implements Serializable {
+public class Toot implements Serializable, Comparable<Toot> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,4 +51,16 @@ public class Toot implements Serializable {
         this.tootMessage = tootMessage;
     }
 
+    @Override
+    public int compareTo(Toot toot) {
+
+        int result = 1;
+
+        if (toot != null) {
+
+            result = (this.getTootId() - toot.getTootId()) * -1;
+        }
+
+        return result;
+    }
 }

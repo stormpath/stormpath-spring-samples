@@ -38,7 +38,7 @@
             <label><spring:message code="customer.account.type"/></label>
             <form:radiobutton path="accountType" value="Basic"/><spring:message code="account.basic"/><br/>
             <form:radiobutton path="accountType" value="Premium"/><spring:message code="account.premium"/>
-
+            <form:radiobutton path="accountType" value="Administrator"/><spring:message code="account.administrator"/>
         </div>
         <div id="buttons">
             <div class="help">

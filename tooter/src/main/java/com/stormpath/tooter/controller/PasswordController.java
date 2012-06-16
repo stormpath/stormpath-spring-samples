@@ -106,15 +106,11 @@ public class PasswordController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/changePassword")
-    public String initChangePassword(@RequestParam("accountId") String accountId,
-                                     @RequestParam("passToken") String passToken,
+    public String initChangePassword(@RequestParam("sptoken") String passToken,
                                      ModelMap model,
                                      @ModelAttribute("customer") Customer cust,
                                      BindingResult result) {
 
-        if (accountId.isEmpty()) {
-            result.addError(new ObjectError("password", "The accountId parameter can't be empty"));
-        }
         if (passToken.isEmpty()) {
             result.addError(new ObjectError("password", "The passToken parameter can't be empty"));
         }
