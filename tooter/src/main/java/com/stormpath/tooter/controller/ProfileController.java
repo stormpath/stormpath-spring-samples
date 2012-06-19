@@ -1,5 +1,6 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.account.Account;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.validator.ProfileValidator;
@@ -63,6 +64,12 @@ public class ProfileController {
                 sessionCustomer.setFirstName(customer.getFirstName());
                 sessionCustomer.setLastName(customer.getLastName());
                 sessionCustomer.setPassword(customer.getPassword());
+
+                Account account = (Account) session.getAttribute("stormpathAccount");
+                account.setSurname(customer.getLastName());
+                account.setEmail(customer.getEmail());
+                account.setGivenName(customer.getFirstName());
+                account.save();
 
                 customer = customerDao.updateCustomer(new Customer(sessionCustomer));
 

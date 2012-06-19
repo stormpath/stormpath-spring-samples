@@ -1,9 +1,9 @@
 package com.stormpath.tooter.model.sdk;
 
+import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.ds.DataStore;
-import com.stormpath.sdk.tenant.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
 
     private Directory directory;
 
-    private Tenant tenant;
+    private Application application;
 
     @Value("${stormpath.sdk.tooter.rest.url}")
     private String tooterApplicationURL;
@@ -45,23 +45,18 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     }
 
     @Override
-    public String getPremiumGroupURL() {
-        return premiumGroupURL;
-    }
-
-    @Override
     public String getAdministratorGroupURL() {
         return administratorGroupURL;
     }
 
     @Override
-    public Tenant getTenant() {
+    public Application getApplication() {
 
-        if (tenant == null) {
-            tenant = getClient().getCurrentTenant();
+        if (application == null) {
+            this.application = getDataStore().load(getTooterApplicationURL(), Application.class);
         }
 
-        return tenant;
+        return application;
     }
 
     @Override

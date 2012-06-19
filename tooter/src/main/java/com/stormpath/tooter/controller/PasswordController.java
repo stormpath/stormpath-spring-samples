@@ -1,6 +1,8 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.account.Account;
 import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.validator.ChangePasswordValidator;
 import com.stormpath.tooter.validator.ResetPasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * Created with IntelliJ IDEA.
  * User: ecrisostomo
@@ -30,6 +34,9 @@ public class PasswordController {
     ChangePasswordValidator changePasswordValidator;
 
     ResetPasswordValidator resetPasswordValidator;
+
+    @Autowired
+    CustomerDao customerDao;
 
     public PasswordController() {
     }
@@ -63,15 +70,30 @@ public class PasswordController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/changePassword")
     public String processChangePassword(@ModelAttribute("customer") Customer customer,
-                                        BindingResult result, SessionStatus status) {
+                                        BindingResult result,
+                                        SessionStatus status,
+                                        HttpSession session) {
 
         changePasswordValidator.validate(customer, result);
 
         if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
             return "changePassword";
         } else {
+
+            Account account = (Account) session.getAttribute("stormpathAccount");
+            account.setPassword(customer.getPassword());
+
+            try {
+                customer = customerDao.getCustomerByUserName(account.getUsername());
+                account.save();
+                session.removeAttribute("stormpathAccount");
+                customerDao.updateCustomer(new Customer(customer));
+
+            } catch (RuntimeException re) {
+                re.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
 
             status.setComplete();
 
@@ -109,11 +131,16 @@ public class PasswordController {
     public String initChangePassword(@RequestParam("sptoken") String passToken,
                                      ModelMap model,
                                      @ModelAttribute("customer") Customer cust,
-                                     BindingResult result) {
+                                     BindingResult result,
+                                     HttpSession session) {
 
         if (passToken.isEmpty()) {
             result.addError(new ObjectError("password", "The passToken parameter can't be empty"));
         }
+
+        //TODO: get Account from password token validation
+        Account account = null;
+        session.setAttribute("stormpathAccount", account);
 
         //return form view
         return "changePassword";

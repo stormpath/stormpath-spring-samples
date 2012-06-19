@@ -65,8 +65,11 @@
                     <c:when test="${not empty sessionScope.sessionCustomer}">
                         <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
                         ${tootItem.tootMessage}
-                        <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>">
-                            <spring:message code="tooter.remove.toot"/></a>
+                        <c:if test="${sessionScope.permissionUtil.isGroupAllowed(sessionScope.removeTootPermission, sessionScope.accountGroups)}">
+                            <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>"
+                               style="color: #000000; font-weight: bolder;">
+                                <spring:message code="tooter.remove.toot"/></a>
+                        </c:if>
                     </c:when>
                     <c:otherwise>
                         ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}

@@ -1,6 +1,6 @@
 package com.stormpath.tooter.controller;
 
-import com.stormpath.sdk.application.Application;
+import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.authc.UsernamePasswordRequest;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
@@ -68,13 +68,14 @@ public class LoginController {
             if (dbCustomer != null) {
 
                 try {
-                    Application application = stormpathSDKService.
-                            getDataStore().
-                            load(stormpathSDKService.
-                                    getTooterApplicationURL(), Application.class);
 
+                    Account account = stormpathSDKService.getApplication().
+                            authenticate(
+                                    new UsernamePasswordRequest(
+                                            dbCustomer.getUserName(),
+                                            dbCustomer.getPassword()));
 
-                    application.authenticate(new UsernamePasswordRequest(dbCustomer.getUserName(), dbCustomer.getPassword()));
+                    session.setAttribute("stormpathAccount", account);
 
                     session.setAttribute("sessionCustomer", dbCustomer);
 

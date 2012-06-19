@@ -1,10 +1,14 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.group.Group;
+import com.stormpath.sdk.group.GroupList;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.Toot;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.dao.TootDao;
 import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.util.PermissionUtil;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +24,9 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,6 +50,9 @@ public class TootController {
     @Autowired
     StormpathSDKService stormpathSDKService;
 
+    @Autowired
+    PermissionUtil permissionUtil;
+
     public TootController() {
     }
 
@@ -60,17 +69,11 @@ public class TootController {
 
         tootValidator.validate(toot, result);
 
-        if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
-            return "tooter";
-        } else {
+        Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
 
-            Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
+        if (!result.hasErrors()) {
+
             Customer persistCustomer = new Customer(sessionCustomer);
-
-            //TODO: add Reset Password redirect logic. SDK?
-
 
             List<Toot> tootList;
             Toot persistToot = new Toot();
@@ -87,16 +90,16 @@ public class TootController {
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-
-            toot.setTootMessage("");
-            toot.setCustomer(sessionCustomer);
-
-            status.setComplete();
-
-
-            //form success
-            return "tooter";
         }
+
+        toot.setTootMessage("");
+        toot.setCustomer(sessionCustomer);
+
+        status.setComplete();
+
+
+        //form success
+        return "tooter";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/tooter")
@@ -112,15 +115,31 @@ public class TootController {
 
         try {
 
-            Object objCustomer = session.getAttribute("sessionCustomer");
-            Customer customer;
+            Customer customer = (Customer) session.getAttribute("sessionCustomer");
 
-            if (objCustomer == null) {
+            if (customer == null) {
 
                 customer = customerDao.getCustomerByUserName(userName);
             } else {
 
-                customer = (Customer) objCustomer;
+                session.setAttribute("permissionUtil", permissionUtil);
+
+                session.setAttribute("removeTootPermission", PermissionUtil.REMOVE_TOOT_PERMISSION);
+
+                Account account = (Account) session.getAttribute("stormpathAccount");
+
+                if (account != null && session.getAttribute("accountGroups") == null) {
+
+                    Map<String, String> groupURLs = new HashMap<String, String>();
+
+                    GroupList groupList = account.getGroups();
+
+                    for (Group group : groupList) {
+                        groupURLs.put(group.getHref(), group.getHref());
+                    }
+
+                    session.setAttribute("accountGroups", groupURLs);
+                }
             }
 
             tootList = tootDao.getTootsByUserId(customer.getId());

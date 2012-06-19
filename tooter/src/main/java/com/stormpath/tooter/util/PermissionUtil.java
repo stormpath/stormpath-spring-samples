@@ -32,6 +32,7 @@ public class PermissionUtil {
     void init() {
         permissionsMap = new HashMap<String, List<String>>();
         List<String> groups = new ArrayList<String>();
+
         groups.add(stormpathSDKService.getAdministratorGroupURL());
         permissionsMap.put(REMOVE_TOOT_PERMISSION, groups);
 
@@ -43,7 +44,27 @@ public class PermissionUtil {
         permissionsMap = null;
     }
 
-    public boolean isGroupAllowed(String permissionId, String groupURL) {
-        return true;
+    public boolean isGroupAllowed(String permissionId, Map<String, String> groupURLs) {
+
+        boolean isGroupAllowed = false;
+
+        if (permissionId != null && groupURLs != null) {
+
+            if (permissionsMap.containsKey(permissionId)) {
+
+                List<String> permissionGroupURLs = permissionsMap.get(permissionId);
+
+                for (String group : permissionGroupURLs) {
+
+                    if (groupURLs.containsKey(group)) {
+
+                        isGroupAllowed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return isGroupAllowed;
     }
 }

@@ -1,9 +1,9 @@
 package com.stormpath.tooter.model.sdk;
 
+import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.ds.DataStore;
-import com.stormpath.sdk.tenant.Tenant;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,14 +20,12 @@ public interface StormpathSDKService {
 
     String getAdministratorGroupURL();
 
-    String getPremiumGroupURL();
-
     DataStore getDataStore();
 
     Directory getDirectory();
 
-    Tenant getTenant();
-
     String getDirectoryURL();
+
+    Application getApplication();
 
 }
