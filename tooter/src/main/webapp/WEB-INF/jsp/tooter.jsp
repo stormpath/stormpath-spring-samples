@@ -24,13 +24,13 @@
     <span style="font-size: 25px">
         <spring:message code="tooter.title"/>
     </span>
-
+    <%--    Stormpath's Account-Groups association functionality comming soon
     <span style="padding-left: 400px">
         <label><spring:message code="customer.account.type"/>:</label>
         <a href="#" onclick="return showWindow()">${toot.customer.accountType}</a>
-     </span>
+     </span>--%>
     <c:if test="${not empty sessionScope.sessionCustomer}">
-         <span style="padding-left: 25px">
+         <span style="padding-left: 525px">
              <input type=button name=type value='${toot.customer.firstName} ${toot.customer.lastName}'
                     onclick="setVisibility('accOptions');">
          </span>
@@ -39,8 +39,8 @@
     <spring:message code="welcome.sample.app"/>
 
     <div id="accOptions" style="display:none; padding-left: 462px">
-        <a href="<c:url value='/profile?accountId=${toot.customer.userName}'/>"><spring:message
-                code="profile.title"/></a>
+        <a href="<c:url value='/profile?accountId=${toot.customer.userName}'/>">
+            <spring:message code="profile.title"/></a>
 
         <div style="padding-left: 640px"><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a>
         </div>
@@ -65,19 +65,24 @@
                     <c:when test="${not empty sessionScope.sessionCustomer}">
                         <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
                         ${tootItem.tootMessage}
+                        <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>"
+                           style="color: #000000; font-weight: bolder;">
+                            <spring:message code="tooter.remove.toot"/></a>
+                        <%--                        Stormpath's Account-Groups association functionality comming soon
                         <c:if test="${sessionScope.permissionUtil.isGroupAllowed(sessionScope.removeTootPermission, sessionScope.accountGroups)}">
                             <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>"
                                style="color: #000000; font-weight: bolder;">
                                 <spring:message code="tooter.remove.toot"/></a>
-                        </c:if>
+                        </c:if>--%>
                     </c:when>
                     <c:otherwise>
                         ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}
                     </c:otherwise>
                 </c:choose>
-                <div style="padding-left: 650px">
-                        ${tootItem.customer.accountType} <spring:message code="customer.account"/>
-                </div>
+                    <%--                Stormpath's Account-Groups association functionality comming soon
+                    <div style="padding-left: 650px">
+                            ${tootItem.customer.accountType} <spring:message code="customer.account"/>
+                    </div>--%>
             </div>
             <br/>
         </c:forEach>

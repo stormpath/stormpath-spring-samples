@@ -66,6 +66,8 @@ public class SignUpController {
 
                 String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
 
+                // For account creation, we should get an instance of Account from the DataStore,
+                // set the account properties and save it to the proper directory.
                 Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
 
                 account.setEmail(customer.getEmail());
@@ -74,6 +76,7 @@ public class SignUpController {
                 account.setPassword(customer.getPassword());
                 account.setUsername(userName);
 
+                // Saving the account to the Directory where the Tooter application belongs.
                 Directory directory = stormpathSDKService.getDirectory();
                 directory.createAccount(account);
 
@@ -97,7 +100,6 @@ public class SignUpController {
     public String initForm(ModelMap model) {
 
         Customer cust = new Customer();
-        cust.setAccountType(Customer.BASIC_ACCOUNT);
 
         model.addAttribute("customer", cust);
 

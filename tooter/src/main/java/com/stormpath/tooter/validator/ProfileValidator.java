@@ -24,8 +24,6 @@ public class ProfileValidator implements Validator {
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "profile.required.firstName", "Field first name is required");
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "profile.required.password", "Field password is required");
-
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "profile.required.lastName", "Field last name is required");
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "profile.required.email", "Field email is required");

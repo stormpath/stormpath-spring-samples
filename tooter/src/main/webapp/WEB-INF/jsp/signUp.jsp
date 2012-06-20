@@ -34,12 +34,13 @@
             <label for="confirmPassword"><spring:message code="customer.password.confirm"/></label>
             <form:password id="confirmPassword" path="confirmPassword"/>
         </div>
+        <%--   Stormpath's Account-Groups association functionality comming soon
         <div>
             <label><spring:message code="customer.account.type"/></label>
             <form:radiobutton path="accountType" value="Basic"/><spring:message code="account.basic"/><br/>
             <form:radiobutton path="accountType" value="Premium"/><spring:message code="account.premium"/>
             <form:radiobutton path="accountType" value="Administrator"/><spring:message code="account.administrator"/>
-        </div>
+        </div>--%>
         <div id="buttons">
             <div class="help">
                 <a href="<c:url value='/login'/>"><spring:message code="return.message"/></a>

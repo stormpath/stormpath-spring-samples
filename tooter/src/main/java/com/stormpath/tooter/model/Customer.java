@@ -1,5 +1,7 @@
 package com.stormpath.tooter.model;
 
+import com.stormpath.sdk.account.Account;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -9,8 +11,6 @@ import java.util.List;
 public class Customer implements Serializable {
 
 
-    public static String BASIC_ACCOUNT = "Basic";
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
@@ -19,22 +19,22 @@ public class Customer implements Serializable {
     @Column(name = "userName")
     String userName;
 
-    @Column(name = "password")
+    @Transient
     String password;
 
     @Transient
     String confirmPassword;
 
-    @Column(name = "firstName")
+    @Transient
     String firstName;
 
-    @Column(name = "lastName")
+    @Transient
     String lastName;
 
-    @Column(name = "accountType")
+    @Transient
     String accountType;
 
-    @Column(name = "email")
+    @Transient
     String email;
 
     @Transient
@@ -54,6 +54,15 @@ public class Customer implements Serializable {
             setPassword(customer.getPassword());
             setTootList(customer.getTootList());
             setUserName(customer.getUserName());
+        }
+    }
+
+    public Customer(Account account) {
+        if (account != null) {
+            setEmail(account.getEmail());
+            setFirstName(account.getGivenName());
+            setLastName(account.getSurname());
+            setUserName(account.getUsername());
         }
     }
 

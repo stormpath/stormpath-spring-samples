@@ -51,31 +51,32 @@ public class ProfileController {
 
         profileValidator.validate(customer, result);
 
-        if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
-        } else {
+        if (!result.hasErrors()) {
 
             try {
-                Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
 
-                sessionCustomer.setAccountType(customer.getAccountType());
-                sessionCustomer.setEmail(customer.getEmail());
-                sessionCustomer.setFirstName(customer.getFirstName());
-                sessionCustomer.setLastName(customer.getLastName());
-                sessionCustomer.setPassword(customer.getPassword());
-
+                // For account update, we just retrieve the current account and
+                // call Account.save() after setting the modified properties.
+                // An account can also be retrieved from the DataStore,
+                // like the way we do it to get an Application or Directory object,
+                // if the account's Rest URL is known to the application.
                 Account account = (Account) session.getAttribute("stormpathAccount");
                 account.setSurname(customer.getLastName());
                 account.setEmail(customer.getEmail());
                 account.setGivenName(customer.getFirstName());
                 account.save();
 
-                customer = customerDao.updateCustomer(new Customer(sessionCustomer));
+                Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
+
+                sessionCustomer.setAccountType(customer.getAccountType());
+                sessionCustomer.setEmail(customer.getEmail());
+                sessionCustomer.setFirstName(customer.getFirstName());
+                sessionCustomer.setLastName(customer.getLastName());
 
                 customer.setUserName(sessionCustomer.getUserName());
                 customer.setTootList(sessionCustomer.getTootList());
 
+                model.addAttribute("messageKey", "updated");
                 model.addAttribute("customer", customer);
 
 

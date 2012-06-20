@@ -14,6 +14,11 @@
     <form:form method="POST" commandName="customer">
 
         <form:errors path="*" cssClass="errorblock" element="div"/>
+        <c:if test="${not empty messageKey}">
+            <div class="messageblock">
+                <spring:message code="profile.message.${messageKey}"/>
+            </div>
+        </c:if>
         <div>
             <label for="firstName"><spring:message code="customer.first.name"/></label>
             <form:input id="firstName" path="firstName"/>
@@ -26,14 +31,11 @@
             <label for="email"><spring:message code="customer.email"/></label>
             <form:input id="email" path="email"/>
         </div>
-        <div>
-            <label for="password"><spring:message code="customer.password"/></label>
-            <form:password id="password" path="password"/>
-        </div>
+        <%--   Stormpath's Account-Groups association functionality comming soon
         <div>
             <label><spring:message code="customer.account.type"/></label>
             <form:radiobutton path="accountType" value="${customer.accountType}"/>${customer.accountType}
-        </div>
+        </div>--%>
         <div id="buttons">
             <div class="help">
                 <a href="<c:url value='/tooter?accountId=${customer.userName}'/>"><spring:message

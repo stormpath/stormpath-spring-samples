@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
@@ -12,14 +11,11 @@
     </h3>
     <br/>
     <spring:message code="reset.password.submission.message"/>
-    <form:form method="POST" commandName="customer">
-
-        <div id="buttons">
-            <div class="help">
-                <a href="<c:url value='/login'/>"><spring:message code="reset.password.return.to.login"/></a>
-            </div>
+    <div id="buttons">
+        <div class="help">
+            <a href="<c:url value='/login'/>"><spring:message code="reset.password.return.to.login"/></a>
         </div>
-    </form:form>
+    </div>
 </div>
 </body>
 </html>

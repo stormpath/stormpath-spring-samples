@@ -75,8 +75,14 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <!-- Stormpath SDK      -->
+    <!-- Stormpath SDK Client configuration     -->
+    <!--
+         First, we need to create an ApiKey instance. For this purpose,
+         we'll use the DefaultApiKey that is included in the Stormpath SDK.
 
+         The arguments values (accessId and secretKey) are obtained from the Stormpath account
+         that will be performing all of the calls to the API.
+     -->
     <bean name="apiKey" class="com.stormpath.sdk.client.DefaultApiKey">
         <constructor-arg index="0">
             <value type="java.lang.String">${stormpath.sdk.accessId}</value>
@@ -86,6 +92,12 @@
         </constructor-arg>
     </bean>
 
+    <!--
+           Second, we need to create the Client instance to interact with the Stormpath application.
+
+           The arguments values are obtained from the previously created ApiKey
+           and the URL of the Stormpath application that the Client will use.
+    -->
     <bean name="sdkClient" class="com.stormpath.sdk.client.Client">
         <constructor-arg index="0">
             <ref bean="apiKey"/>

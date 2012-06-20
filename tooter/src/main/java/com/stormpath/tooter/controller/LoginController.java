@@ -47,53 +47,52 @@ public class LoginController {
 
         loginValidator.validate(customer, result);
 
-        String returnStr;
+        String returnStr = "login";
 
-        if (result.hasErrors()) {
-            returnStr = "login";
-        } else {
-
-            status.setComplete();
-
-
-            Customer dbCustomer = null;
+        if (!result.hasErrors()) {
 
             try {
 
-                dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
+                Customer dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
+
+                // For authentication the only thing we need to do is call Application.authenticate(),
+                // instantiating the proper AuthenticationRequest (UsernamePasswordRequest in this case),
+                // providing the account's credentials.
+                Account account = stormpathSDKService.getApplication().
+                        authenticate(
+                                new UsernamePasswordRequest(
+                                        customer.getUserName(),
+                                        customer.getPassword()));
+
+                // If the customer queried from the database does not exist
+                // we create it in the application's internal database,
+                // so we don't have to go through the process of signing a user up
+                // that has already been authenticated in the previous call to the Stormpath API.
+                // This is because the application uses an in-memory database (HSQLDB)
+                // that only persists while the application is up.
+                if (dbCustomer == null) {
+
+                    dbCustomer = new Customer(account);
+
+                    customerDao.saveCustomer(dbCustomer);
+                }
+
+                // We save the Stormpath account in the session for later use.
+                session.setAttribute("stormpathAccount", account);
+
+                session.setAttribute("sessionCustomer", dbCustomer);
+
+                returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
+
+                status.setComplete();
+            } catch (RuntimeException re) {
+
+                result.addError(new ObjectError("userName", re.getMessage()));
+                re.printStackTrace();
+
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-
-            if (dbCustomer != null) {
-
-                try {
-
-                    Account account = stormpathSDKService.getApplication().
-                            authenticate(
-                                    new UsernamePasswordRequest(
-                                            dbCustomer.getUserName(),
-                                            dbCustomer.getPassword()));
-
-                    session.setAttribute("stormpathAccount", account);
-
-                    session.setAttribute("sessionCustomer", dbCustomer);
-
-                    returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
-                } catch (RuntimeException re) {
-
-                    result.addError(new ObjectError("userName", re.getMessage()));
-                    re.printStackTrace();
-                    returnStr = "login";
-
-                }
-
-            } else {
-
-                result.addError(new ObjectError("userName", "The user with Username '" + customer.getUserName() + "' does not exist."));
-                returnStr = "login";
-            }
-
         }
 
         return returnStr;

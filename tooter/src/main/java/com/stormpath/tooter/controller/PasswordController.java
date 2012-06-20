@@ -84,15 +84,11 @@ public class PasswordController {
             account.setPassword(customer.getPassword());
 
             try {
-                customer = customerDao.getCustomerByUserName(account.getUsername());
                 account.save();
                 session.removeAttribute("stormpathAccount");
-                customerDao.updateCustomer(new Customer(customer));
 
             } catch (RuntimeException re) {
                 re.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
             status.setComplete();

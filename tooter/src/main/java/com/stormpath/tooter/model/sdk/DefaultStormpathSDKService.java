@@ -73,7 +73,7 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     public DataStore getDataStore() {
 
         if (dataStore == null) {
-            dataStore = client.getDataStore();
+            dataStore = getClient().getDataStore();
         }
 
         return dataStore;
