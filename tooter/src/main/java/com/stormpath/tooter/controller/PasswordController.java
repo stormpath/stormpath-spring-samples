@@ -93,8 +93,6 @@ public class PasswordController {
 
             status.setComplete();
 
-            //TODO: add redirect logic. SDK?
-
 
             //form success
             return "redirect:/login/message?loginMsg=passChanged";

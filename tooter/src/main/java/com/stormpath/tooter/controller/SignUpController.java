@@ -53,23 +53,17 @@ public class SignUpController {
         singUpValidator.validate(customer, result);
 
         if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
+
             return "signUp";
         } else {
-
-            status.setComplete();
-
-            //TODO: add redirect logic. SDK?
 
             try {
 
                 String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
 
                 // For account creation, we should get an instance of Account from the DataStore,
-                // set the account properties and save it to the proper directory.
+                // set the account properties and create it in the proper directory.
                 Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
-
                 account.setEmail(customer.getEmail());
                 account.setGivenName(customer.getFirstName());
                 account.setSurname(customer.getLastName());
@@ -82,6 +76,9 @@ public class SignUpController {
 
                 customer.setUserName(userName);
                 customerDao.saveCustomer(customer);
+
+                status.setComplete();
+
             } catch (RuntimeException re) {
                 result.addError(new ObjectError("password", re.getMessage()));
                 re.printStackTrace();

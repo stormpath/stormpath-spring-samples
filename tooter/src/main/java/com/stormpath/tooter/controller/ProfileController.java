@@ -67,7 +67,6 @@ public class ProfileController {
                 account.save();
 
                 Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
-
                 sessionCustomer.setAccountType(customer.getAccountType());
                 sessionCustomer.setEmail(customer.getEmail());
                 sessionCustomer.setFirstName(customer.getFirstName());
