@@ -53,8 +53,6 @@ public class LoginController {
 
             try {
 
-                Customer dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
-
                 // For authentication the only thing we need to do is call Application.authenticate(),
                 // instantiating the proper AuthenticationRequest (UsernamePasswordRequest in this case),
                 // providing the account's credentials.
@@ -64,23 +62,25 @@ public class LoginController {
                                         customer.getUserName(),
                                         customer.getPassword()));
 
+                Customer accCustomer = new Customer(account);
+
+
                 // If the customer queried from the database does not exist
                 // we create it in the application's internal database,
                 // so we don't have to go through the process of signing a user up
                 // that has already been authenticated in the previous call to the Stormpath API.
                 // This is because the application uses an in-memory database (HSQLDB)
                 // that only persists while the application is up.
+                Customer dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
                 if (dbCustomer == null) {
 
-                    dbCustomer = new Customer(account);
-
-                    customerDao.saveCustomer(dbCustomer);
+                    customerDao.saveCustomer(accCustomer);
                 }
 
                 // We save the Stormpath account in the session for later use.
                 session.setAttribute("stormpathAccount", account);
 
-                session.setAttribute("sessionCustomer", dbCustomer);
+                session.setAttribute("sessionCustomer", accCustomer);
 
                 returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
 

@@ -53,7 +53,7 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     public Application getApplication() {
 
         if (application == null) {
-            this.application = getDataStore().load(getTooterApplicationURL(), Application.class);
+            application = getDataStore().load(getTooterApplicationURL(), Application.class);
         }
 
         return application;

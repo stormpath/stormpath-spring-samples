@@ -112,9 +112,10 @@ public class TootController {
 
             Customer customer = (Customer) session.getAttribute("sessionCustomer");
 
-            if (customer == null) {
+            if (customer == null || customer.getId() == null) {
 
-                customer = customerDao.getCustomerByUserName(userName);
+                Customer dbCustomer = customerDao.getCustomerByUserName(userName);
+                customer.setId(dbCustomer.getId());
             } /*else {    Stormpath's Account-Groups association functionality comming soon
 
                 session.setAttribute("permissionUtil", permissionUtil);
