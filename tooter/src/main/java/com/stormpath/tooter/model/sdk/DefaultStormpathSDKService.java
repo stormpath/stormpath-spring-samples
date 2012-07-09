@@ -53,7 +53,7 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     public Application getApplication() {
 
         if (application == null) {
-            application = getDataStore().load(getTooterApplicationURL(), Application.class);
+            application = getDataStore().getResource(getTooterApplicationURL(), Application.class);
         }
 
         return application;
@@ -83,7 +83,7 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     public Directory getDirectory() {
 
         if (directory == null) {
-            directory = getDataStore().load(getDirectoryURL(), Directory.class);
+            directory = getDataStore().getResource(getDirectoryURL(), Directory.class);
         }
 
         return directory;

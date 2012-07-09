@@ -120,4 +120,17 @@ public class LoginController {
         return "login";
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/emailVerificationTokens")
+    public String accountVerification(@RequestParam("sptoken") String token,
+                                      BindingResult result,
+                                      ModelMap model) {
+
+
+        //TODO: get Account from email token validation
+
+        return "redirect:/login/message?loginMsg=accVerified";
+
+    }
+
+
 }
