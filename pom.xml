@@ -107,7 +107,7 @@
         <spring.version>3.1.0.RELEASE</spring.version>
         <taglibs.version>1.1.2</taglibs.version>
         <logback.version>0.9.24</logback.version>
-        <stormpath.sdk.version>0.3.0-SNAPSHOT</stormpath.sdk.version>
+        <stormpath.sdk.version>0.4.0-SNAPSHOT</stormpath.sdk.version>
         <hibernate.version>3.3.2.GA</hibernate.version>
         <cglib.version>2.2</cglib.version>
         <javassist.version>3.8.0.GA</javassist.version>
@@ -247,8 +247,13 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>com.stormpath.sdk.java</groupId>
+                <groupId>com.stormpath.sdk</groupId>
                 <artifactId>stormpath-sdk-api</artifactId>
+                <version>${stormpath.sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.stormpath.sdk</groupId>
+                <artifactId>stormpath-sdk-httpclient</artifactId>
                 <version>${stormpath.sdk.version}</version>
             </dependency>
             <dependency>

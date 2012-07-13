@@ -73,8 +73,12 @@
             <artifactId>jstl</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.stormpath.sdk.java</groupId>
+            <groupId>com.stormpath.sdk</groupId>
             <artifactId>stormpath-sdk-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.stormpath.sdk</groupId>
+            <artifactId>stormpath-sdk-httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
