@@ -63,6 +63,9 @@ public class Customer implements Serializable {
             setFirstName(account.getGivenName());
             setLastName(account.getSurname());
             setUserName(account.getUsername());
+            if (account.getGroupMemberships().iterator().hasNext()) {
+                setAccountType(account.getGroupMemberships().iterator().next().getGroup().getHref());
+            }
         }
     }
 

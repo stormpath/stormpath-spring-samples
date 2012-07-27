@@ -31,11 +31,10 @@
             <label for="email"><spring:message code="customer.email"/></label>
             <form:input id="email" path="email"/>
         </div>
-        <%--   Stormpath's Account-Groups association functionality comming soon
         <div>
             <label><spring:message code="customer.account.type"/></label>
-            <form:radiobutton path="accountType" value="${customer.accountType}"/>${customer.accountType}
-        </div>--%>
+            <form:radiobuttons path="accountType" items="${groupMap}"/>
+        </div>
         <div id="buttons">
             <div class="help">
                 <a href="<c:url value='/tooter?accountId=${customer.userName}'/>"><spring:message

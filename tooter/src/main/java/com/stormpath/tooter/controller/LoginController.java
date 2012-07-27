@@ -122,13 +122,23 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/emailVerificationTokens")
     public String accountVerification(@RequestParam("sptoken") String token,
-                                      BindingResult result,
-                                      ModelMap model) {
+                                      @ModelAttribute("customer") Customer customer,
+                                      BindingResult result) {
 
+        String returnStr = "login";
 
-        //TODO: get Account from email token validation
+        try {
 
-        return "redirect:/login/message?loginMsg=accVerified";
+            stormpathSDKService.getClient().getCurrentTenant().verifyAccountEmail(token);
+            returnStr = "redirect:/login/message?loginMsg=accVerified";
+
+        } catch (RuntimeException re) {
+
+            result.addError(new ObjectError("userName", re.getMessage()));
+            re.printStackTrace();
+        }
+
+        return returnStr;
 
     }
 

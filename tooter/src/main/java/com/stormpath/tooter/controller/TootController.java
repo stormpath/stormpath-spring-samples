@@ -1,5 +1,8 @@
 package com.stormpath.tooter.controller;
 
+import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.group.GroupMembership;
+import com.stormpath.sdk.group.GroupMembershipList;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.Toot;
 import com.stormpath.tooter.model.dao.CustomerDao;
@@ -21,7 +24,9 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -116,7 +121,7 @@ public class TootController {
 
                 Customer dbCustomer = customerDao.getCustomerByUserName(userName);
                 customer.setId(dbCustomer.getId());
-            } /*else {    Stormpath's Account-Groups association functionality comming soon
+            } else {
 
                 session.setAttribute("permissionUtil", permissionUtil);
 
@@ -128,15 +133,15 @@ public class TootController {
 
                     Map<String, String> groupURLs = new HashMap<String, String>();
 
-                    GroupList groupList = account.getGroups();
+                    GroupMembershipList groupMembershipList = account.getGroupMemberships();
 
-                    for (Group group : groupList) {
-                        groupURLs.put(group.getHref(), group.getHref());
+                    for (GroupMembership groupMembership : groupMembershipList) {
+                        groupURLs.put(groupMembership.getGroup().getHref(), groupMembership.getGroup().getDescription());
                     }
 
                     session.setAttribute("accountGroups", groupURLs);
                 }
-            }   */
+            }
 
             tootList = tootDao.getTootsByUserId(customer.getId());
             Collections.sort(tootList);

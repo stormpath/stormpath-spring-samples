@@ -1,8 +1,11 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.group.Group;
+import com.stormpath.sdk.group.GroupMembership;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
+import com.stormpath.tooter.model.sdk.StormpathSDKService;
 import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +38,9 @@ public class ProfileController {
 
     @Autowired
     CustomerDao customerDao;
+
+    @Autowired
+    StormpathSDKService stormpathSDKService;
 
     public ProfileController() {
     }
@@ -64,6 +72,22 @@ public class ProfileController {
                 account.setSurname(customer.getLastName());
                 account.setEmail(customer.getEmail());
                 account.setGivenName(customer.getFirstName());
+
+                if (account.getGroupMemberships().iterator().hasNext()) {
+
+                    GroupMembership groupMembership = account.getGroupMemberships().iterator().next();
+                    if (!groupMembership.getGroup().getHref().equals(customer.getAccountType())) {
+
+                        groupMembership.delete();
+                        account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                    }
+
+                } else {
+
+                    account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                }
+
+
                 account.save();
 
                 Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
@@ -95,6 +119,14 @@ public class ProfileController {
 
 
         Customer customer = (Customer) session.getAttribute("sessionCustomer");
+
+        Map<String, String> groupMap = new HashMap<String, String>();
+
+        for (Group group : stormpathSDKService.getDirectory().getGroups()) {
+            groupMap.put(group.getHref(), group.getName());
+        }
+
+        model.addAttribute("groupMap", groupMap);
 
         model.addAttribute("customer", customer);
 

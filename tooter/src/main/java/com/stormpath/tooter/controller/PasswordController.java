@@ -3,6 +3,7 @@ package com.stormpath.tooter.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
+import com.stormpath.tooter.model.sdk.StormpathSDKService;
 import com.stormpath.tooter.validator.ChangePasswordValidator;
 import com.stormpath.tooter.validator.ResetPasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class PasswordController {
     @Autowired
     CustomerDao customerDao;
 
+    @Autowired
+    StormpathSDKService stormpathSDKService;
+
     public PasswordController() {
     }
 
@@ -53,14 +57,20 @@ public class PasswordController {
         resetPasswordValidator.validate(customer, result);
 
         if (result.hasErrors()) {
-            //if validator failed
-            //TODO: add SDK user validation
+
             return "resetPassword";
         } else {
 
-            status.setComplete();
+            try {
 
-            //TODO: add redirect logic. SDK?
+                stormpathSDKService.getApplication().createPasswordResetToken(customer.getEmail());
+                status.setComplete();
+
+            } catch (RuntimeException re) {
+                result.addError(new ObjectError("email", re.getMessage()));
+                re.printStackTrace();
+                return "resetPassword";
+            }
 
 
             //form success
@@ -87,12 +97,13 @@ public class PasswordController {
                 account.save();
                 session.removeAttribute("stormpathAccount");
 
+                status.setComplete();
+
             } catch (RuntimeException re) {
+                result.addError(new ObjectError("password", re.getMessage()));
                 re.printStackTrace();
+                return "changePassword";
             }
-
-            status.setComplete();
-
 
             //form success
             return "redirect:/login/message?loginMsg=passChanged";
@@ -132,9 +143,16 @@ public class PasswordController {
             result.addError(new ObjectError("password", "The passToken parameter can't be empty"));
         }
 
-        //TODO: get Account from password token validation
-        Account account = null;
-        session.setAttribute("stormpathAccount", account);
+        try {
+
+            Account account = stormpathSDKService.getApplication().verifyPasswordResetToken(passToken).getAccount();
+
+            session.setAttribute("stormpathAccount", account);
+
+        } catch (RuntimeException re) {
+            result.addError(new ObjectError("password", re.getMessage()));
+            re.printStackTrace();
+        }
 
         //return form view
         return "changePassword";
