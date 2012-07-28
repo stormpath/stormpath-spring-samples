@@ -18,7 +18,7 @@
     </div>
     <form:form method="POST" commandName="customer" action="/login">
 
-        <form:errors path="*" cssClass="errorblock" element="div"/>
+        <form:errors path="*" cssClass="errorblock" element="div" htmlEscape="false"/>
         <c:if test="${not empty messageKey}">
             <div class="messageblock">
                 <spring:message code="login.message.${messageKey}"/>

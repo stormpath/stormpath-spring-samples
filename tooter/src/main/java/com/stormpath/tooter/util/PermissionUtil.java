@@ -44,22 +44,32 @@ public class PermissionUtil {
         permissionsMap = null;
     }
 
-    public boolean isGroupAllowed(String permissionId, Map<String, String> groupURLs) {
+    public boolean isGroupAllowed(String permissionId, Map<String, String> groupMap) {
 
         boolean isGroupAllowed = false;
 
-        if (permissionId != null && groupURLs != null) {
+        if (permissionId != null && groupMap != null) {
 
             if (permissionsMap.containsKey(permissionId)) {
 
                 List<String> permissionGroupURLs = permissionsMap.get(permissionId);
 
+                outter:
                 for (String group : permissionGroupURLs) {
 
-                    if (groupURLs.containsKey(group)) {
+                    if (groupMap.containsKey(group)) {
 
                         isGroupAllowed = true;
                         break;
+                    } else {
+
+                        for (String key : groupMap.keySet()) {
+
+                            if (key.contains(group)) {
+                                isGroupAllowed = true;
+                                break outter;
+                            }
+                        }
                     }
                 }
             }

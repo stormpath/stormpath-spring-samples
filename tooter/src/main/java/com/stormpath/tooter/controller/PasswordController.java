@@ -90,10 +90,11 @@ public class PasswordController {
             return "changePassword";
         } else {
 
-            Account account = (Account) session.getAttribute("stormpathAccount");
-            account.setPassword(customer.getPassword());
-
             try {
+
+                Account account = (Account) session.getAttribute("stormpathAccount");
+                account.setPassword(customer.getPassword());
+
                 account.save();
                 session.removeAttribute("stormpathAccount");
 

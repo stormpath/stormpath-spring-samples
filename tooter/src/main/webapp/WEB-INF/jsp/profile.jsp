@@ -33,7 +33,7 @@
         </div>
         <div>
             <label><spring:message code="customer.account.type"/></label>
-            <form:radiobuttons path="accountType" items="${groupMap}"/>
+            <form:radiobuttons path="accountType" items="${sessionScope.groupMap}"/>
         </div>
         <div id="buttons">
             <div class="help">

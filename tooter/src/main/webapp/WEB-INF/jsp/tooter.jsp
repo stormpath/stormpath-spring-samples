@@ -71,15 +71,15 @@
                                style="color: #000000; font-weight: bolder;">
                                 <spring:message code="tooter.remove.toot"/></a>
                         </c:if>
+                        <span style="padding-left: 10px">
+                                ${sessionScope.accountGroups[tootItem.customer.accountType]} <spring:message
+                                code="customer.account"/>
+                        </span>
                     </c:when>
                     <c:otherwise>
                         ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}
                     </c:otherwise>
                 </c:choose>
-                <div style="padding-left: 10px">
-                        ${sessionScope.accountGroups[tootItem.customer.accountType]} <spring:message
-                        code="customer.account"/>
-                </div>
             </div>
             <br/>
         </c:forEach>

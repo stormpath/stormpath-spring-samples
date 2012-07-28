@@ -85,6 +85,11 @@ public class TootController {
                 tootDao.saveToot(persistToot);
                 toot.setTootId(persistToot.getTootId());
                 tootList = tootDao.getTootsByUserId(persistCustomer.getId());
+
+                for (Toot itemToot : tootList) {
+                    itemToot.setCustomer(sessionCustomer);
+                }
+
                 Collections.sort(tootList);
                 sessionCustomer.setTootList(tootList);
             } catch (Exception e) {
@@ -120,7 +125,7 @@ public class TootController {
             if (customer == null || customer.getId() == null) {
 
                 Customer dbCustomer = customerDao.getCustomerByUserName(userName);
-                customer.setId(dbCustomer.getId());
+                customer = new Customer(dbCustomer);
             } else {
 
                 session.setAttribute("permissionUtil", permissionUtil);
@@ -129,31 +134,33 @@ public class TootController {
 
                 Account account = (Account) session.getAttribute("stormpathAccount");
 
-                if (account != null && session.getAttribute("accountGroups") == null) {
+                Map<String, String> groupURLs = new HashMap<String, String>();
+                groupURLs.put(Customer.BASIC_ACCOUNT_TYPE, Customer.BASIC_ACCOUNT_TYPE);
 
-                    Map<String, String> groupURLs = new HashMap<String, String>();
+                GroupMembershipList groupMembershipList = account.getGroupMemberships();
 
-                    GroupMembershipList groupMembershipList = account.getGroupMemberships();
-
-                    for (GroupMembership groupMembership : groupMembershipList) {
-                        groupURLs.put(groupMembership.getGroup().getHref(), groupMembership.getGroup().getDescription());
-                    }
-
-                    session.setAttribute("accountGroups", groupURLs);
+                for (GroupMembership groupMembership : groupMembershipList) {
+                    groupURLs.put(groupMembership.getGroup().getHref(), groupMembership.getGroup().getName());
                 }
+
+                session.setAttribute("accountGroups", groupURLs);
             }
 
             tootList = tootDao.getTootsByUserId(customer.getId());
+
+            for (Toot itemToot : tootList) {
+                itemToot.setCustomer(customer);
+            }
+
             Collections.sort(tootList);
             customer.setTootList(tootList);
             tooot.setCustomer(customer);
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
         model.addAttribute("toot", tooot);
 
-        //return form view
         return "tooter";
     }
 
@@ -171,11 +178,10 @@ public class TootController {
                     ((Customer) session.getAttribute("sessionCustomer")).getUserName() :
                     userName;
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
 
-        //return form view
         return "redirect:/tooter?accountId=" + userName;
     }
 }

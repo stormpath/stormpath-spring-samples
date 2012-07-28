@@ -52,7 +52,7 @@ public class SignUpController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") Customer customer, ModelMap model, BindingResult result, SessionStatus status) {
 
         singUpValidator.validate(customer, result);
 
@@ -73,11 +73,14 @@ public class SignUpController {
                 account.setSurname(customer.getLastName());
                 account.setPassword(customer.getPassword());
                 account.setUsername(userName);
-                account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
 
                 // Saving the account to the Directory where the Tooter application belongs.
                 Directory directory = stormpathSDKService.getDirectory();
                 directory.createAccount(account);
+
+                if (!Customer.BASIC_ACCOUNT_TYPE.equals(customer.getAccountType())) {
+                    account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                }
 
                 customer.setUserName(userName);
                 customerDao.saveCustomer(customer);
@@ -85,6 +88,15 @@ public class SignUpController {
                 status.setComplete();
 
             } catch (RuntimeException re) {
+
+                Map<String, String> groupMap = new HashMap<String, String>();
+
+                for (Group group : stormpathSDKService.getDirectory().getGroups()) {
+                    groupMap.put(group.getHref(), group.getName());
+                }
+
+                model.addAttribute("groupMap", groupMap);
+
                 result.addError(new ObjectError("password", re.getMessage()));
                 re.printStackTrace();
                 return "signUp";

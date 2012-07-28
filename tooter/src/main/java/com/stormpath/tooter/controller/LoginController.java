@@ -80,6 +80,10 @@ public class LoginController {
                 // We save the Stormpath account in the session for later use.
                 session.setAttribute("stormpathAccount", account);
 
+                if (dbCustomer != null) {
+                    accCustomer.setId(dbCustomer.getId());
+                }
+
                 session.setAttribute("sessionCustomer", accCustomer);
 
                 returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
@@ -91,7 +95,7 @@ public class LoginController {
                 re.printStackTrace();
 
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }
 
@@ -100,6 +104,20 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String initForm(@ModelAttribute("customer") Customer customer, BindingResult result, ModelMap model) {
+
+        try {
+
+            stormpathSDKService.getClient().getCurrentTenant();
+
+        } catch (Throwable t) {
+
+            result.addError(new ObjectError("userName",
+                    "You have not finished configuring this sample application. " +
+                            "Please follow the <a href=\"https://github.com/stormpath/stormpath-spring-samples/wiki/Tooter\">" +
+                            "Set-up Instructions</a>"));
+            t.printStackTrace();
+        }
+
 
         model.addAttribute("customer", customer);
 

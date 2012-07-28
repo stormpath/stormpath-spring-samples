@@ -126,7 +126,7 @@ public class ProfileController {
             groupMap.put(group.getHref(), group.getName());
         }
 
-        model.addAttribute("groupMap", groupMap);
+        session.setAttribute("groupMap", groupMap);
 
         model.addAttribute("customer", customer);
 

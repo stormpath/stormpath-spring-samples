@@ -11,6 +11,8 @@ import java.util.List;
 public class Customer implements Serializable {
 
 
+    public final static String BASIC_ACCOUNT_TYPE = "Basic";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
@@ -32,7 +34,7 @@ public class Customer implements Serializable {
     String lastName;
 
     @Transient
-    String accountType;
+    String accountType = BASIC_ACCOUNT_TYPE;
 
     @Transient
     String email;
