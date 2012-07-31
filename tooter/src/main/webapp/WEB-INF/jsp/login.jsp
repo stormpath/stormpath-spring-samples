@@ -5,7 +5,7 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="account.login"/></title>
-    <link rel="stylesheet" href="../../assets/styles/style.css" type="text/css"/>
+    <link rel="stylesheet" href="assets/styles/style.css" type="text/css"/>
 </head>
 <body>
 <div class="contentpanel" element="div">

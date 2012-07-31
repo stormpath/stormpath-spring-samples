@@ -4,7 +4,7 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="tooter.title"/></title>
-    <link rel="stylesheet" href="../../assets/styles/style.css" type="text/css"/>
+    <link rel="stylesheet" href="assets/styles/style.css" type="text/css"/>
     <SCRIPT TYPE="text/javascript">
         function showWindow() {
             var url = '/accountTypeMsg.html';

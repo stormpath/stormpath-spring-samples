@@ -56,58 +56,55 @@ public class SignUpController {
 
         singUpValidator.validate(customer, result);
 
-        if (result.hasErrors()) {
+        Map<String, String> groupMap = null;
 
-            return "signUp";
-        } else {
+        try {
 
-            try {
+            if (result.hasErrors()) {
 
-                String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
+                setGroupsToModel(groupMap, model);
 
-                // For account creation, we should get an instance of Account from the DataStore,
-                // set the account properties and create it in the proper directory.
-                Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
-                account.setEmail(customer.getEmail());
-                account.setGivenName(customer.getFirstName());
-                account.setSurname(customer.getLastName());
-                account.setPassword(customer.getPassword());
-                account.setUsername(userName);
-
-                // Saving the account to the Directory where the Tooter application belongs.
-                Directory directory = stormpathSDKService.getDirectory();
-                directory.createAccount(account);
-
-                if (!Customer.BASIC_ACCOUNT_TYPE.equals(customer.getAccountType())) {
-                    account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
-                }
-
-                customer.setUserName(userName);
-                customerDao.saveCustomer(customer);
-
-                status.setComplete();
-
-            } catch (RuntimeException re) {
-
-                Map<String, String> groupMap = new HashMap<String, String>();
-
-                for (Group group : stormpathSDKService.getDirectory().getGroups()) {
-                    groupMap.put(group.getHref(), group.getName());
-                }
-
-                model.addAttribute("groupMap", groupMap);
-
-                result.addError(new ObjectError("password", re.getMessage()));
-                re.printStackTrace();
                 return "signUp";
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
 
-            //form success
-            return "redirect:/login/message?loginMsg=registered";
+            String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
+
+            // For account creation, we should get an instance of Account from the DataStore,
+            // set the account properties and create it in the proper directory.
+            Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
+            account.setEmail(customer.getEmail());
+            account.setGivenName(customer.getFirstName());
+            account.setSurname(customer.getLastName());
+            account.setPassword(customer.getPassword());
+            account.setUsername(userName);
+
+            // Saving the account to the Directory where the Tooter application belongs.
+            Directory directory = stormpathSDKService.getDirectory();
+            directory.createAccount(account);
+
+            if (!Customer.BASIC_ACCOUNT_TYPE.equals(customer.getAccountType())) {
+                account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+            }
+
+            customer.setUserName(userName);
+            customerDao.saveCustomer(customer);
+
+            status.setComplete();
+
+        } catch (RuntimeException re) {
+
+            setGroupsToModel(groupMap, model);
+
+            result.addError(new ObjectError("password", re.getMessage()));
+            re.printStackTrace();
+            return "signUp";
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        //form success
+        return "redirect:/login/message?loginMsg=registered";
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -115,7 +112,19 @@ public class SignUpController {
 
         Customer cust = new Customer();
 
-        Map<String, String> groupMap = new HashMap<String, String>();
+        Map<String, String> groupMap = null;
+
+        setGroupsToModel(groupMap, model);
+
+        model.addAttribute("customer", cust);
+
+        //return form view
+        return "signUp";
+    }
+
+    private void setGroupsToModel(Map<String, String> groupMap, ModelMap model) {
+
+        groupMap = new HashMap<String, String>();
 
         for (Group group : stormpathSDKService.getDirectory().getGroups()) {
             groupMap.put(group.getHref(), group.getName());
@@ -123,10 +132,6 @@ public class SignUpController {
 
         model.addAttribute("groupMap", groupMap);
 
-        model.addAttribute("customer", cust);
-
-        //return form view
-        return "signUp";
     }
 
 }
