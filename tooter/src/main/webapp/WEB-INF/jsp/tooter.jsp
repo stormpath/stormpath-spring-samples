@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
     <SCRIPT TYPE="text/javascript">
         function showWindow() {
-            var url = '/accountTypeMsg.html';
+            var url = '${pageContext.request.contextPath}/accountTypeMsg.html';
             someWindow = window.open(url, 'Account Type Message', 'width=400,height=200,scrollbars=yes');
         }
         function setVisibility(id) {
