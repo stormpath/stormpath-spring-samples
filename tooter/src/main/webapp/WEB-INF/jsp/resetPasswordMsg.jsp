@@ -3,7 +3,7 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="signUp.now"/></title>
-    <link rel="stylesheet" href="assets/styles/style.css" type="text/css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
 </head>
 <body>
 <div class="contentpanel" element="div">

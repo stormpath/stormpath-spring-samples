@@ -93,6 +93,9 @@ public class PasswordController {
             try {
 
                 Account account = (Account) session.getAttribute("stormpathAccount");
+
+                // we have to retrieve the account from the server to properly save the password
+                account = stormpathSDKService.getDataStore().getResource(account.getHref(), Account.class);
                 account.setPassword(customer.getPassword());
 
                 account.save();

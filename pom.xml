@@ -21,7 +21,7 @@
     <groupId>com.stormpath.samples.spring</groupId>
     <artifactId>stormpath-spring-samples-root</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.2-SNAPSHOT</version>
+    <version>0.2.3-SNAPSHOT</version>
 
     <name>Stormpath Spring Sample Applications</name>
     <url>https://github.com/stormpath/stormpath-spring-samples</url>
