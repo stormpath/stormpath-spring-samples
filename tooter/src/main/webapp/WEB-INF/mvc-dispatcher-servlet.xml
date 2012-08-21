@@ -84,7 +84,7 @@
              (this location can be overridden using Spring's PropertyPlaceholderConfigurer settings: -->
         <property name="apiKeyFileLocation" value="${stormpath.sdk.apiKey.fileLocation}"/>
     </bean>
-    <bean id="sdkClient" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <bean id="stormpathClient" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="targetObject" ref="stormpathClientBuilder"/>
         <property name="targetMethod" value="build"/>
     </bean>

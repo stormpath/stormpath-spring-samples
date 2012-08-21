@@ -15,7 +15,7 @@
  */
 package com.stormpath.tooter.util;
 
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,16 +37,15 @@ public class PermissionUtil {
     private Map<String, List<String>> permissionsMap;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
     @PostConstruct
     void init() {
         permissionsMap = new HashMap<String, List<String>>();
         List<String> groups = new ArrayList<String>();
 
-        groups.add(stormpathSDKService.getAdministratorGroupURL());
+        groups.add(stormpath.getAdministratorGroupURL());
         permissionsMap.put(REMOVE_TOOT_PERMISSION, groups);
-
     }
 
     @PreDestroy
@@ -65,7 +64,7 @@ public class PermissionUtil {
 
                 List<String> permissionGroupURLs = permissionsMap.get(permissionId);
 
-                outter:
+                outer:
                 for (String group : permissionGroupURLs) {
 
                     if (groupMap.containsKey(group)) {
@@ -78,7 +77,7 @@ public class PermissionUtil {
 
                             if (key.contains(group)) {
                                 isGroupAllowed = true;
-                                break outter;
+                                break outer;
                             }
                         }
                     }

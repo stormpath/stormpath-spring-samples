@@ -18,7 +18,7 @@ package com.stormpath.tooter.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.ChangePasswordValidator;
 import com.stormpath.tooter.validator.ResetPasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class PasswordController {
     CustomerDao customerDao;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
     public PasswordController() {
     }
@@ -75,7 +75,7 @@ public class PasswordController {
             return "resetPassword";
         } else {
             try {
-                stormpathSDKService.getApplication().sendPasswordResetEmail(customer.getEmail());
+                stormpath.getApplication().sendPasswordResetEmail(customer.getEmail());
             } catch (RuntimeException re) {
                 result.addError(new ObjectError("email", re.getMessage()));
                 re.printStackTrace();
@@ -125,7 +125,7 @@ public class PasswordController {
 
         try {
             //New password was specified - verify the reset token and apply the new password:
-            Account account = stormpathSDKService.getApplication().verifyPasswordResetToken(sptoken);
+            Account account = stormpath.getApplication().verifyPasswordResetToken(sptoken);
 
             //token is valid, set the password and sync to Stormpath:
             account.setPassword(customer.getPassword());

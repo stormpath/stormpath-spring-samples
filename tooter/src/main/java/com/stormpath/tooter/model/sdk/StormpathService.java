@@ -19,14 +19,16 @@ import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.ds.DataStore;
+import com.stormpath.sdk.tenant.Tenant;
 
 /**
- * This service provides functionalities for communicating with the Stormpath API and using its SDK,
- * from the Tooter application.
+ * The Stormpath SDK can be used to interact with anything in a Stormpath tenant.
+ * <p/>
+ * This service provides an even simpler abstraction specific to Tooter's needs only.
  *
  * @author Elder Crisostomo
  */
-public interface StormpathSDKService {
+public interface StormpathService {
 
     /**
      * Gets the Client object that interacts with the Stormpath API.
@@ -56,6 +58,13 @@ public interface StormpathSDKService {
      * @return the DataStore from the Client object.
      */
     DataStore getDataStore();
+
+    /**
+     * Returns the Tenant that owns the Tooter application.
+     *
+     * @return the Tenant that owns the Tooter application.
+     */
+    Tenant getTenant();
 
     /**
      * Gets the Directory, where the Tooter application is located, from the DataStore object.

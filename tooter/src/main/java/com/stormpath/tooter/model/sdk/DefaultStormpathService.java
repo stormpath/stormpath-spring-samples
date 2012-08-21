@@ -19,8 +19,7 @@ import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.ds.DataStore;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.stormpath.sdk.tenant.Tenant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +29,9 @@ import javax.annotation.Resource;
  * @author Elder Crisostomo
  */
 @Service
-public class DefaultStormpathSDKService implements StormpathSDKService {
+public class DefaultStormpathService implements StormpathService {
 
-    @Resource(name = "sdkClient")
+    @Resource(name = "stormpathClient")
     private Client client;
 
     private DataStore dataStore;
@@ -40,6 +39,8 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
     private Directory directory;
 
     private Application application;
+
+    private Tenant tenant;
 
     @Value("${stormpath.sdk.tooter.rest.url}")
     private String tooterApplicationURL;
@@ -65,11 +66,9 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
 
     @Override
     public Application getApplication() {
-
         if (application == null) {
             application = getDataStore().getResource(getTooterApplicationURL(), Application.class);
         }
-
         return application;
     }
 
@@ -85,21 +84,25 @@ public class DefaultStormpathSDKService implements StormpathSDKService {
 
     @Override
     public DataStore getDataStore() {
-
         if (dataStore == null) {
             dataStore = getClient().getDataStore();
         }
-
         return dataStore;
     }
 
     @Override
-    public Directory getDirectory() {
+    public Tenant getTenant() {
+        if (tenant == null) {
+            tenant = getClient().getCurrentTenant();
+        }
+        return tenant;
+    }
 
+    @Override
+    public Directory getDirectory() {
         if (directory == null) {
             directory = getDataStore().getResource(getDirectoryURL(), Directory.class);
         }
-
         return directory;
     }
 }

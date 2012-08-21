@@ -20,7 +20,7 @@ import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.group.Group;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.SignUpValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +51,7 @@ public class SignUpController {
     SignUpValidator singUpValidator;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
 
     public SignUpController() {
@@ -82,7 +82,7 @@ public class SignUpController {
 
             // For account creation, we should get an instance of Account from the DataStore,
             // set the account properties and create it in the proper directory.
-            Account account = stormpathSDKService.getDataStore().instantiate(Account.class);
+            Account account = stormpath.getDataStore().instantiate(Account.class);
             account.setEmail(customer.getEmail());
             account.setGivenName(customer.getFirstName());
             account.setSurname(customer.getLastName());
@@ -90,11 +90,11 @@ public class SignUpController {
             account.setUsername(userName);
 
             // Saving the account to the Directory where the Tooter application belongs.
-            Directory directory = stormpathSDKService.getDirectory();
+            Directory directory = stormpath.getDirectory();
             directory.createAccount(account);
 
             if (!Customer.BASIC_ACCOUNT_TYPE.equals(customer.getAccountType())) {
-                account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
             }
 
             customer.setUserName(userName);
@@ -137,7 +137,7 @@ public class SignUpController {
 
         groupMap = new HashMap<String, String>();
 
-        for (Group group : stormpathSDKService.getDirectory().getGroups()) {
+        for (Group group : stormpath.getDirectory().getGroups()) {
             groupMap.put(group.getHref(), group.getName());
         }
 

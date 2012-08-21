@@ -20,7 +20,7 @@ import com.stormpath.sdk.group.Group;
 import com.stormpath.sdk.group.GroupMembership;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +51,7 @@ public class ProfileController {
     CustomerDao customerDao;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
     public ProfileController() {
     }
@@ -90,12 +90,12 @@ public class ProfileController {
                     if (!groupMembership.getGroup().getHref().equals(customer.getAccountType())) {
 
                         groupMembership.delete();
-                        account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                        account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
                     }
 
                 } else {
 
-                    account.addGroup(stormpathSDKService.getDataStore().getResource(customer.getAccountType(), Group.class));
+                    account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
                 }
 
 
@@ -133,7 +133,7 @@ public class ProfileController {
 
         Map<String, String> groupMap = new HashMap<String, String>();
 
-        for (Group group : stormpathSDKService.getDirectory().getGroups()) {
+        for (Group group : stormpath.getDirectory().getGroups()) {
             groupMap.put(group.getHref(), group.getName());
         }
 

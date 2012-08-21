@@ -22,7 +22,7 @@ import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.Toot;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.dao.TootDao;
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.util.PermissionUtil;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class TootController {
     CustomerDao customerDao;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
     @Autowired
     PermissionUtil permissionUtil;

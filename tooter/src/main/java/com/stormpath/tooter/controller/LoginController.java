@@ -16,11 +16,12 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.authc.AuthenticationRequest;
 import com.stormpath.sdk.authc.AuthenticationResult;
 import com.stormpath.sdk.authc.UsernamePasswordRequest;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
-import com.stormpath.tooter.model.sdk.StormpathSDKService;
+import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.LoginValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,7 +50,7 @@ public class LoginController {
     CustomerDao customerDao;
 
     @Autowired
-    StormpathSDKService stormpathSDKService;
+    StormpathService stormpath;
 
     @Autowired
     public LoginController(LoginValidator loginValidator) {
@@ -73,10 +74,8 @@ public class LoginController {
                 // For authentication the only thing we need to do is call Application.authenticate(),
                 // instantiating the proper AuthenticationRequest (UsernamePasswordRequest in this case),
                 // providing the account's credentials.
-                AuthenticationResult authcResult = stormpathSDKService.getApplication().authenticateAccount(
-                                new UsernamePasswordRequest(
-                                        customer.getUserName(),
-                                        customer.getPassword()));
+                AuthenticationRequest request = new UsernamePasswordRequest(customer.getUserName(), customer.getPassword());
+                AuthenticationResult authcResult = stormpath.getApplication().authenticateAccount(request);
 
                 Account account = authcResult.getAccount();
 
@@ -120,20 +119,15 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String initForm(@ModelAttribute("customer") Customer customer, BindingResult result, ModelMap model) {
-
         try {
-
-            stormpathSDKService.getClient().getCurrentTenant();
-
+            stormpath.getTenant();
         } catch (Throwable t) {
-
             result.addError(new ObjectError("userName",
                     "You have not finished configuring this sample application. " +
                             "Please follow the <a href=\"https://github.com/stormpath/stormpath-spring-samples/wiki/Tooter\">" +
                             "Set-up Instructions</a>"));
             t.printStackTrace();
         }
-
 
         model.addAttribute("customer", customer);
 
@@ -163,7 +157,7 @@ public class LoginController {
 
         try {
 
-            stormpathSDKService.getClient().getCurrentTenant().verifyAccountEmail(token);
+            stormpath.getTenant().verifyAccountEmail(token);
             returnStr = "redirect:/login/message?loginMsg=accVerified";
 
         } catch (RuntimeException re) {
