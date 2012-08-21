@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Stormpath, Inc. and contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stormpath.tooter.model;
 
 import com.stormpath.sdk.account.Account;
@@ -6,10 +21,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * @author Elder Crisostomo
+ */
 @Entity
 @Table(name = "T_ACCOUNT")
 public class Customer implements Serializable {
-
 
     public final static String BASIC_ACCOUNT_TYPE = "Basic";
 
@@ -22,10 +39,13 @@ public class Customer implements Serializable {
     String userName;
 
     @Transient
-    String password;
+    String password; //used during password set/reset only.  Do NOT store users' passwords - let Stormpath do that safely for you.
 
     @Transient
-    String confirmPassword;
+    String confirmPassword; //used during password set/reset only.
+
+    @Transient
+    String sptoken; //used during password reset only.
 
     @Transient
     String firstName;
@@ -117,6 +137,14 @@ public class Customer implements Serializable {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public String getSptoken() {
+        return sptoken;
+    }
+
+    public void setSptoken(String sptoken) {
+        this.sptoken = sptoken;
     }
 
     public String getFirstName() {

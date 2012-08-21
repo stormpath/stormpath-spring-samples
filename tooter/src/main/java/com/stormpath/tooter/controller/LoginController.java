@@ -1,6 +1,22 @@
+/*
+ * Copyright 2012 Stormpath, Inc. and contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.authc.AuthenticationResult;
 import com.stormpath.sdk.authc.UsernamePasswordRequest;
 import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.dao.CustomerDao;
@@ -21,6 +37,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * @since 0.1
+ * @author Elder Crisostomo
  */
 @Controller
 @RequestMapping("/login")
@@ -56,14 +73,14 @@ public class LoginController {
                 // For authentication the only thing we need to do is call Application.authenticate(),
                 // instantiating the proper AuthenticationRequest (UsernamePasswordRequest in this case),
                 // providing the account's credentials.
-                Account account = stormpathSDKService.getApplication().
-                        authenticate(
+                AuthenticationResult authcResult = stormpathSDKService.getApplication().authenticateAccount(
                                 new UsernamePasswordRequest(
                                         customer.getUserName(),
                                         customer.getPassword()));
 
-                Customer accCustomer = new Customer(account);
+                Account account = authcResult.getAccount();
 
+                Customer accCustomer = new Customer(account);
 
                 // If the customer queried from the database does not exist
                 // we create it in the application's internal database,
@@ -73,7 +90,6 @@ public class LoginController {
                 // that only persists while the application is up.
                 Customer dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
                 if (dbCustomer == null) {
-
                     customerDao.saveCustomer(accCustomer);
                 }
 

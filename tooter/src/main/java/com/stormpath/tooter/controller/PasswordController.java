@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Stormpath, Inc. and contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
@@ -10,23 +25,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
 
 /**
- * Created with IntelliJ IDEA.
- * User: ecrisostomo
- * Date: 6/8/12
- * Time: 3:45 PM
- * To change this template use File | Settings | File Templates.
+ * @author Elder Crisostomo
  */
 @Controller
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -51,114 +60,87 @@ public class PasswordController {
         this.resetPasswordValidator = resetPasswordValidator;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/resetPassword")
-    public String processResetPassword(@ModelAttribute("customer") Customer customer, BindingResult result, SessionStatus status) {
+    @RequestMapping(value = "/password/forgot", method = RequestMethod.GET)
+    public String initResetPassword(Model model) {
+        model.addAttribute("customer", new Customer());
+        return "resetPassword";
+    }
+
+    @RequestMapping(value = "/password/forgot", method = RequestMethod.POST)
+    public String processResetPassword(Customer customer, BindingResult result) {
 
         resetPasswordValidator.validate(customer, result);
 
         if (result.hasErrors()) {
-
             return "resetPassword";
         } else {
-
             try {
-
-                stormpathSDKService.getApplication().createPasswordResetToken(customer.getEmail());
-                status.setComplete();
-
+                stormpathSDKService.getApplication().sendPasswordResetEmail(customer.getEmail());
             } catch (RuntimeException re) {
                 result.addError(new ObjectError("email", re.getMessage()));
                 re.printStackTrace();
                 return "resetPassword";
             }
 
-
             //form success
             return "resetPasswordMsg";
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/changePassword")
-    public String processChangePassword(@ModelAttribute("customer") Customer customer,
-                                        BindingResult result,
-                                        SessionStatus status,
-                                        HttpSession session) {
+    @RequestMapping(value = "/password/message", method = RequestMethod.GET)
+    public String initResetPasswordMsg(Model model) {
+        Customer cust = new Customer();
+        model.addAttribute("customer", cust);
+        return "resetPasswordMsg";
+    }
+
+    @RequestMapping(value = "/password/reset", method = RequestMethod.GET)
+    public String initChangePassword(Customer cust) {
+
+        if (!StringUtils.hasText(cust.getSptoken())) {
+            //invalid page access - no one should visit this page unless they're resetting their password and they have
+            //a valid sptoken:
+            return "redirect:/password/forgot";
+        }
+
+        //show the form:
+        return "changePassword";
+    }
+
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
+    public String processChangePassword(Customer customer, BindingResult result, HttpSession session) {
 
         changePasswordValidator.validate(customer, result);
 
         if (result.hasErrors()) {
             return "changePassword";
-        } else {
-
-            try {
-
-                Account account = (Account) session.getAttribute("stormpathAccount");
-
-                // we have to retrieve the account from the server to properly save the password
-                account = stormpathSDKService.getDataStore().getResource(account.getHref(), Account.class);
-                account.setPassword(customer.getPassword());
-
-                account.save();
-                session.removeAttribute("stormpathAccount");
-
-                status.setComplete();
-
-            } catch (RuntimeException re) {
-                result.addError(new ObjectError("password", re.getMessage()));
-                re.printStackTrace();
-                return "changePassword";
-            }
-
-            //form success
-            return "redirect:/login/message?loginMsg=passChanged";
         }
-    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/resetPassword")
-    public String initResetPassword(ModelMap model) {
+        String sptoken = customer.getSptoken();
 
-        Customer cust = new Customer();
-
-        model.addAttribute("customer", cust);
-
-        //return form view
-        return "resetPassword";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/resetPasswordMsg")
-    public String initResetPasswordMsg(ModelMap model) {
-
-        Customer cust = new Customer();
-
-        model.addAttribute("customer", cust);
-
-        //return form view
-        return "resetPasswordMsg";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/changePassword")
-    public String initChangePassword(@RequestParam("sptoken") String passToken,
-                                     ModelMap model,
-                                     @ModelAttribute("customer") Customer cust,
-                                     BindingResult result,
-                                     HttpSession session) {
-
-        if (passToken.isEmpty()) {
-            result.addError(new ObjectError("password", "The passToken parameter can't be empty"));
+        if (!StringUtils.hasText(sptoken)) {
+            //invalid page access - should have an sptoken from the setup form.
+            return "redirect:/password/forgot";
         }
 
         try {
+            //New password was specified - verify the reset token and apply the new password:
+            Account account = stormpathSDKService.getApplication().verifyPasswordResetToken(sptoken);
 
-            Account account = stormpathSDKService.getApplication().verifyPasswordResetToken(passToken).getAccount();
+            //token is valid, set the password and sync to Stormpath:
+            account.setPassword(customer.getPassword());
+            account.save();
 
-            session.setAttribute("stormpathAccount", account);
+            //remove any stale value:
+            session.removeAttribute("stormpathAccount");
 
         } catch (RuntimeException re) {
             result.addError(new ObjectError("password", re.getMessage()));
             re.printStackTrace();
+            return "changePassword";
         }
 
-        //return form view
-        return "changePassword";
+        //form success
+        return "redirect:/login/message?loginMsg=passChanged";
     }
 }

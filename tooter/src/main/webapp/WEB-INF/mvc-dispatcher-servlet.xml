@@ -1,3 +1,18 @@
+<!--
+  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -9,9 +24,9 @@
 	http://www.springframework.org/schema/mvc
     http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-    <context:component-scan base-package="com.stormpath.tooter"/>
     <context:property-placeholder location="classpath:application.properties"/>
-
+    <context:component-scan base-package="com.stormpath.tooter"/>
+    <context:annotation-config/>
     <mvc:annotation-driven/>
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
     <mvc:default-servlet-handler/>
@@ -23,21 +38,12 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <bean class="com.stormpath.tooter.validator.LoginValidator"/>
-    <bean class="com.stormpath.tooter.validator.SignUpValidator"/>
-    <bean class="com.stormpath.tooter.validator.ResetPasswordValidator"/>
-    <bean class="com.stormpath.tooter.validator.ChangePasswordValidator"/>
-    <bean class="com.stormpath.tooter.validator.TootValidator"/>
-    <bean class="com.stormpath.tooter.validator.ProfileValidator"/>
-
     <!-- Register the message.properties -->
     <bean id="messageSource"
           class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basename" value="message"/>
     </bean>
 
-    <!-- DABASE CONFIGURATION -->
-    <!-- Data Source -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
         <property name="url" value="jdbc:hsqldb:mem:tooter"/>
@@ -51,8 +57,6 @@
     <!-- Hibernate Session Factory  -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-
-        <!-- Hibernate configuration -->
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
@@ -61,7 +65,6 @@
                 <prop key="hibernate.connection.autocommit">true</prop>
             </props>
         </property>
-
         <!-- The packages that contain our Hibernate model classes -->
         <property name="packagesToScan">
             <list>
@@ -76,35 +79,14 @@
     </bean>
 
     <!-- Stormpath SDK Client configuration     -->
-    <!--
-         First, we need to create an ApiKey instance. For this purpose,
-         we'll use the DefaultApiKey that is included in the Stormpath SDK.
-
-         The arguments values (accessId and secretKey) are obtained from the Stormpath account
-         that will be performing all of the calls to the API.
-     -->
-    <bean name="apiKey" class="com.stormpath.sdk.client.DefaultApiKey">
-        <constructor-arg index="0">
-            <value type="java.lang.String">${stormpath.sdk.accessId}</value>
-        </constructor-arg>
-        <constructor-arg index="1">
-            <value type="java.lang.String">${stormpath.sdk.secretKey}</value>
-        </constructor-arg>
+    <bean id="stormpathClientBuilder" class="com.stormpath.sdk.client.ClientBuilder">
+        <!-- Acquire the Stormpath API Key file from the location specified in application.properties
+             (this location can be overridden using Spring's PropertyPlaceholderConfigurer settings: -->
+        <property name="apiKeyFileLocation" value="${stormpath.sdk.apiKey.fileLocation}"/>
     </bean>
-
-    <!--
-           Second, we need to create the Client instance to interact with the Stormpath application.
-
-           The arguments values are obtained from the previously created ApiKey
-           and the URL of the Stormpath application that the Client will use.
-    -->
-    <bean name="sdkClient" class="com.stormpath.sdk.client.Client">
-        <constructor-arg index="0">
-            <ref bean="apiKey"/>
-        </constructor-arg>
-        <constructor-arg index="1">
-            <value type="java.lang.String">${stormpath.sdk.url}</value>
-        </constructor-arg>
+    <bean id="sdkClient" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="stormpathClientBuilder"/>
+        <property name="targetMethod" value="build"/>
     </bean>
 
 </beans>
