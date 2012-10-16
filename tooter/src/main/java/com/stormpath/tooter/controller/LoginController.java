@@ -19,6 +19,7 @@ import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.authc.AuthenticationRequest;
 import com.stormpath.sdk.authc.AuthenticationResult;
 import com.stormpath.sdk.authc.UsernamePasswordRequest;
+import com.stormpath.sdk.resource.ResourceException;
 import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
@@ -106,11 +107,9 @@ public class LoginController {
                 returnStr = "redirect:/tooter";
 
                 status.setComplete();
-            } catch (RuntimeException re) {
-
+            } catch (ResourceException re) {
                 result.addError(new ObjectError("userName", re.getMessage()));
                 re.printStackTrace();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -23,6 +23,7 @@ import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.SignUpValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,11 @@ public class SignUpController {
     @Autowired
     StormpathService stormpath;
 
+    @Value("${stormpath.sdk.administrator.rest.url}")
+    private String administratorGroupURL;
+
+    @Value("${stormpath.sdk.premium.rest.url}")
+    private String premiumGroupURL;
 
     public SignUpController() {
     }
@@ -63,9 +69,9 @@ public class SignUpController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") User customer, ModelMap model, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") User user, ModelMap model, BindingResult result, SessionStatus status) {
 
-        singUpValidator.validate(customer, result);
+        singUpValidator.validate(user, result);
 
         Map<String, String> groupMap = null;
 
@@ -73,37 +79,41 @@ public class SignUpController {
 
             if (result.hasErrors()) {
 
+                model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+                model.addAttribute("PREMIUM_URL", premiumGroupURL);
                 setGroupsToModel(groupMap, model);
 
                 return "signUp";
             }
 
-            String userName = customer.getFirstName().toLowerCase() + customer.getLastName().toLowerCase();
+            String userName = user.getFirstName().toLowerCase() + user.getLastName().toLowerCase();
 
             // For account creation, we should get an instance of Account from the DataStore,
             // set the account properties and create it in the proper directory.
             Account account = stormpath.getDataStore().instantiate(Account.class);
-            account.setEmail(customer.getEmail());
-            account.setGivenName(customer.getFirstName());
-            account.setSurname(customer.getLastName());
-            account.setPassword(customer.getPassword());
+            account.setEmail(user.getEmail());
+            account.setGivenName(user.getFirstName());
+            account.setSurname(user.getLastName());
+            account.setPassword(user.getPassword());
             account.setUsername(userName);
 
             // Saving the account to the Directory where the Tooter application belongs.
             Directory directory = stormpath.getDirectory();
             directory.createAccount(account);
 
-//            if (!User.NO_GROUP.equals(customer.getGroup())) {
-//                account.addGroup(stormpath.getDataStore().getResource(customer.getGroup(), Group.class));
-//            }
+            if (user.getGroupUrl() != null && !user.getGroupUrl().isEmpty()) {
+                account.addGroup(stormpath.getDataStore().getResource(user.getGroupUrl(), Group.class));
+            }
 
-            customer.setUserName(userName);
-            customerDao.saveCustomer(customer);
+            user.setUserName(userName);
+            customerDao.saveCustomer(user);
 
             status.setComplete();
 
         } catch (RuntimeException re) {
 
+            model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+            model.addAttribute("PREMIUM_URL", premiumGroupURL);
             setGroupsToModel(groupMap, model);
 
             result.addError(new ObjectError("password", re.getMessage()));
@@ -128,6 +138,8 @@ public class SignUpController {
         setGroupsToModel(groupMap, model);
 
         model.addAttribute("customer", cust);
+        model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+        model.addAttribute("PREMIUM_URL", premiumGroupURL);
 
         //return form view
         return "signUp";

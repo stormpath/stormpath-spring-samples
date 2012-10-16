@@ -18,6 +18,7 @@ package com.stormpath.tooter.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.group.Group;
 import com.stormpath.sdk.group.GroupMembership;
+import com.stormpath.sdk.resource.ResourceException;
 import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,6 +75,9 @@ public class ProfileController {
                                 HttpSession session,
                                 ModelMap model) {
 
+        model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+        model.addAttribute("PREMIUM_URL", premiumGroupURL);
+
         profileValidator.validate(user, result);
 
         if (!result.hasErrors()) {
@@ -88,17 +93,21 @@ public class ProfileController {
                 User sessionUser = (User) session.getAttribute("sessionUser");
                 Account account = sessionUser.getAccount();
                 account.setGivenName(user.getFirstName());
-                account.setSurname(user.getFirstName());
+                account.setSurname(user.getLastName());
                 account.setEmail(user.getEmail());
+                account.setUsername(user.getFirstName().toLowerCase() + user.getLastName().toLowerCase());
 
+                String existingGroupUrl = null;
                 if (account.getGroupMemberships().iterator().hasNext()) {
                     GroupMembership groupMembership = account.getGroupMemberships().iterator().next();
-                    if (!groupMembership.getGroup().getHref().equals(user.getGroupUrl())) {
+                    existingGroupUrl = groupMembership.getGroup().getHref();
+                    if (!existingGroupUrl.equals(user.getGroupUrl())) {
                         groupMembership.delete();
+                        existingGroupUrl = null;
                     }
                 }
 
-                if (user.getGroupUrl() != null && !user.getGroupUrl().isEmpty()) {
+                if (user.getGroupUrl() != null && !user.getGroupUrl().isEmpty() && existingGroupUrl == null) {
                     account.addGroup(stormpath.getDataStore().getResource(user.getGroupUrl(), Group.class));
                 }
 
@@ -109,9 +118,11 @@ public class ProfileController {
                 user.setTootList(sessionUser.getTootList());
 
                 model.addAttribute("messageKey", "updated");
-                model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
-                model.addAttribute("PREMIUM_URL", premiumGroupURL);
                 model.addAttribute("user", user);
+            } catch (ResourceException re) {
+                ObjectError error = new ObjectError("user", re.getMessage());
+                result.addError(error);
+                re.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }

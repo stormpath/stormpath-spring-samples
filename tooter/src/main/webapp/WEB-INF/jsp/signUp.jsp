@@ -20,49 +20,59 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="signUp.now"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="<c:url value='/assets/img/favicon.ico'/>"/>
 </head>
-<body>
-<div class="contentpanel" element="div">
-    <h3><spring:message code="signUp.now"/>
-    </h3>
-    <br/>
-    <form:form method="POST" commandName="customer">
+<body style="padding-top: 15px;">
+<div class="container-fluid">
+    <div class="hero-unit">
+        <h3><spring:message code="signUp.now"/></h3>
+        <form:form method="POST" commandName="customer">
 
-        <form:errors path="*" cssClass="errorblock" element="div"/>
-        <div>
-            <label for="firstName"><spring:message code="customer.first.name"/></label>
-            <form:input id="firstName" path="firstName"/>
-        </div>
-        <div>
-            <label for="lastName"><spring:message code="customer.last.name"/></label>
-            <form:input id="lastName" path="lastName"/>
-        </div>
-        <div>
-            <label for="email"><spring:message code="customer.email"/></label>
-            <form:input id="email" path="email"/>
-        </div>
-        <div>
-            <label for="password"><spring:message code="customer.password"/></label>
-            <form:password id="password" path="password"/>
-        </div>
-        <div>
-            <label for="confirmPassword"><spring:message code="customer.password.confirm"/></label>
-            <form:password id="confirmPassword" path="confirmPassword"/>
-        </div>
-        <div>
-            <label><spring:message code="customer.account.type"/></label>
-            <form:radiobuttons path="accountType" items="${groupMap}"/>
-        </div>
-        <div id="buttons">
-            <div class="help">
-                <a href="<c:url value='/login'/>"><spring:message code="return.message"/></a>
-                <span style="padding-left:2px">
-                   <input type="submit" value="<spring:message code="customer.register"/>"/>
-                </span>
+            <form:errors path="*" cssClass="errorblock" element="div"/>
+            <div class="control-group">
+                <label class="control-label" for="firstName"><spring:message code="customer.first.name"/></label>
+                <form:input id="firstName" path="firstName"/>
             </div>
-        </div>
-    </form:form>
+            <div class="control-group">
+                <label class="control-label" for="lastName"><spring:message code="customer.last.name"/></label>
+                <form:input id="lastName" path="lastName"/>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="email"><spring:message code="customer.email"/></label>
+                <form:input id="email" path="email"/>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="password"><spring:message code="customer.password"/></label>
+                <form:password id="password" path="password"/>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="confirmPassword"><spring:message code="customer.password.confirm"/></label>
+                <form:password id="confirmPassword" path="confirmPassword"/>
+            </div>
+            <div class="control-group">
+                <label class="radio inline" style="margin-left: -18px !important;"><spring:message code="customer.account.type"/>:</label>&nbsp;
+                <label class="radio inline">
+                    <form:radiobutton path="groupUrl" cssClass="radio" value="${ADMINISTRATOR_URL}"/> Administrator
+                </label>
+                <label class="radio inline">
+                    <form:radiobutton path="groupUrl" cssClass="radio" value="${PREMIUM_URL}"/> Premium
+                </label>
+                <label class="radio inline">
+                    <form:radiobutton path="groupUrl" cssClass="radio" value="${null}"/> Basic
+                </label>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <a class="btn" href="<c:url value='/login'/>"><spring:message code="return.message"/></a>
+                   <button class="btn btn-primary" type="submit"><spring:message code="customer.register"/></button>
+                </div>
+            </div>
+        </form:form>
+    </div>
 </div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 </body>
 </html>

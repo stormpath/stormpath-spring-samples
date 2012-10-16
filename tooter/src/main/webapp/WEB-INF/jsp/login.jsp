@@ -52,7 +52,7 @@
                 <form:password id="password" path="password"/>
             </div>
             <div id="control-group">
-                <button type="submit" class="btn"><spring:message code="account.login"/></button><br/><br/>
+                <button type="submit" class="btn btn-primary"><spring:message code="account.login"/></button><br/><br/>
             </div>
             <div id="control-group">
                 <a href="<c:url value='/password/forgot'/>"><spring:message code="password.forgot"/></a><br>

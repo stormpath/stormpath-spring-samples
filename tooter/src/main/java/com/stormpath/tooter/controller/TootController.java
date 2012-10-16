@@ -148,22 +148,22 @@ public class TootController {
     }
 
     @RequestMapping("/tooter/remove")
-    public String removeToot(@RequestParam("accountId") String userName,
-                             @RequestParam("removeTootId") String removeTootId,
+    public String removeToot(@RequestParam("id") String id,
                              ModelMap model,
                              @ModelAttribute("Toot") Toot toot,
                              HttpSession session) {
+        User user = (User) session.getAttribute("sessionUser");
 
+        if (user == null || user.getId() == null) {
+            // if they're not in the session, they're probably not logged in
+            return "redirect:/login";
+        }
 
         try {
-            tootDao.removeTootById(Integer.valueOf(removeTootId));
-            userName = userName == null || userName.isEmpty() ?
-                    ((User) session.getAttribute("sessionUser")).getUserName() :
-                    userName;
+            tootDao.removeTootById(Integer.valueOf(id));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         return "redirect:/tooter";
     }

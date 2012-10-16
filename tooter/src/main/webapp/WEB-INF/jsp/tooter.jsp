@@ -82,7 +82,7 @@
                         <c:when test="${not empty sessionScope.sessionUser}">
                             <code><a href="<c:url value='/profile'/>">${tootItem.customer.firstName} ${tootItem.customer.lastName}</a>: ${tootItem.tootMessage}</code>
                             <c:if test="${sessionScope.permissionUtil.hasRole(sessionScope.sessionUser, 'ADMINISTRATOR')}">
-                                <button class="close" title="Delete the toot permanently" onclick="window.location.href='<c:url value='/tooter/remove?removeTootId=${tootItem.tootId}'/>'">&times;</button>
+                                <button class="close" title="Delete the toot permanently" onclick="window.location.href='<c:url value='/tooter/remove?id=${tootItem.tootId}'/>'">&times;</button>
                             </c:if>
                         </c:when>
                         <c:otherwise>
@@ -91,6 +91,11 @@
                     </c:choose>
                 </div>
             </c:forEach>
+            <c:if test="${empty toot.customer.tootList}">
+                <div class="alert">
+                    There are no toots!
+                </div>
+            </c:if>
         </div>
     </div>
 </div>
