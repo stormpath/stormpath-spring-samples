@@ -19,22 +19,19 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="tooter.logout"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
-</head>
-<body>
-<div class="contentpanel" element="div">
-    <h3><spring:message code="tooter.logout"/>
-    </h3>
-    <br/>
+    <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="<c:url value='/assets/img/favicon.ico'/>"/>
 
-    <div>
-        <spring:message code="logout.message"/>
-    </div>
-    <div id="buttons">
-        <div class="help">
-            <a href="<c:url value='/login'/>"><spring:message code="logout.login.page"/></a>
-        </div>
+</head>
+<body style="padding-top: 15px;">
+<div class="container-fluid">
+    <div class="hero-unit">
+        <h3><spring:message code="logout.message"/></h3>
+
+        <a class="btn btn-primary" href="<c:url value='/login'/>"><spring:message code="logout.login.page"/></a>
     </div>
 </div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 </body>
 </html>
