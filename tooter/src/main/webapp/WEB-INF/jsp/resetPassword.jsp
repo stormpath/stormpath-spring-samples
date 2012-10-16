@@ -20,30 +20,36 @@
 <html>
 <head>
     <title id="pageTitle"><spring:message code="signUp.now"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="<c:url value='/assets/img/favicon.ico'/>"/>
 </head>
-<body>
-<div class="contentpanel" element="div">
-    <h3><spring:message code="reset.password.title"/>
-    </h3>
-    <br/>
-    <spring:message code="reset.password.message"/>
-    <form:form method="POST" commandName="customer">
+<body style="padding-top: 15px;">
+<div class="container-fluid">
+    <div class="hero-unit">
+        <h3><spring:message code="reset.password.title"/></h3>
 
-        <form:errors path="*" cssClass="errorblock" element="div"/>
-        <div>
-            <label for="email"><spring:message code="customer.email"/></label>
-            <form:input id="email" path="email"/>
-        </div>
-        <div id="buttons">
-            <div class="help">
-                <a href="<c:url value='/login'/>"><spring:message code="return.message"/></a>
-                <span style="padding-left:2px">
-                   <input type="submit" value="<spring:message code="customer.password.reset"/>"/>
-                </span>
+        <form:form method="POST" commandName="user">
+            <div class="control-group">
+                <spring:message code="reset.password.message"/>
             </div>
-        </div>
-    </form:form>
+            <div class="control-group">
+                <form:errors path="*" cssClass="errorblock" element="div"/>
+            </div>
+            <div class="control-group">
+                <label for="email"><spring:message code="customer.email"/></label>
+                <form:input id="email" path="email"/>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <a class="btn" href="<c:url value='/login'/>"><spring:message code="return.message"/></a>
+                   <button class="btn btn-primary" type="submit"><spring:message code="customer.password.reset"/></button>
+                </div>
+            </div>
+        </form:form>
+    </div>
 </div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 </body>
 </html>

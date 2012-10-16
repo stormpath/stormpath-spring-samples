@@ -62,7 +62,7 @@ public class PasswordController {
 
     @RequestMapping(value = "/password/forgot", method = RequestMethod.GET)
     public String initResetPassword(Model model) {
-        model.addAttribute("customer", new User());
+        model.addAttribute("user", new User());
         return "resetPassword";
     }
 
