@@ -16,7 +16,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.ChangePasswordValidator;
@@ -62,12 +62,12 @@ public class PasswordController {
 
     @RequestMapping(value = "/password/forgot", method = RequestMethod.GET)
     public String initResetPassword(Model model) {
-        model.addAttribute("customer", new Customer());
+        model.addAttribute("customer", new User());
         return "resetPassword";
     }
 
     @RequestMapping(value = "/password/forgot", method = RequestMethod.POST)
-    public String processResetPassword(Customer customer, BindingResult result) {
+    public String processResetPassword(User customer, BindingResult result) {
 
         resetPasswordValidator.validate(customer, result);
 
@@ -89,13 +89,13 @@ public class PasswordController {
 
     @RequestMapping(value = "/password/message", method = RequestMethod.GET)
     public String initResetPasswordMsg(Model model) {
-        Customer cust = new Customer();
+        User cust = new User();
         model.addAttribute("customer", cust);
         return "resetPasswordMsg";
     }
 
     @RequestMapping(value = "/password/reset", method = RequestMethod.GET)
-    public String initChangePassword(Customer cust) {
+    public String initChangePassword(User cust) {
 
         if (!StringUtils.hasText(cust.getSptoken())) {
             //invalid page access - no one should visit this page unless they're resetting their password and they have
@@ -108,7 +108,7 @@ public class PasswordController {
     }
 
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
-    public String processChangePassword(Customer customer, BindingResult result, HttpSession session) {
+    public String processChangePassword(User customer, BindingResult result, HttpSession session) {
 
         changePasswordValidator.validate(customer, result);
 

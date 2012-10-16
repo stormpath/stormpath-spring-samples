@@ -17,90 +17,113 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title id="pageTitle"><spring:message code="tooter.title"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
-    <SCRIPT TYPE="text/javascript">
-        function showWindow() {
-            var url = '${pageContext.request.contextPath}/accountTypeMsg.html';
-            someWindow = window.open(url, 'Account Type Message', 'width=400,height=200,scrollbars=yes');
-        }
-        function setVisibility(id) {
-            if (document.getElementById(id).style.display == 'inline') {
-                document.getElementById(id).style.display = 'none';
-            } else {
-                document.getElementById(id).style.display = 'inline';
-            }
-        }
-    </SCRIPT>
+    <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="<c:url value='/assets/img/favicon.ico'/>"/>
 </head>
-<body>
-<div class="contentpanel" element="div">
-    <span style="font-size: 25px">
-        <spring:message code="tooter.title"/>
-    </span>
-    <c:if test="${not empty sessionScope.sessionCustomer}">
-        <span style="padding-left: 400px">
-            <label><spring:message code="customer.account.type"/>:</label>
-            <a href="#" onclick="return showWindow()">${sessionScope.accountGroups[toot.customer.accountType]}</a>
-         </span>
-    </c:if>
-    <c:if test="${not empty sessionScope.sessionCustomer}">
-         <span style="padding-left: 10px">
-             <input type=button name=type value='${toot.customer.firstName} ${toot.customer.lastName}'
-                    onclick="setVisibility('accOptions');">
-         </span>
-    </c:if>
-    <br/>
-    <spring:message code="welcome.sample.app"/>
+<body style="padding-top: 55px;">
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <a class="brand" style="margin-left: 0px;" href="https://www.stormpath.com">Tooter</a>
+        <ul class="nav">
+            <li class="active"><a href="/tooter">Home</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${sessionScope.sessionUser.firstName} ${sessionScope.sessionUser.lastName} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="showAccountTypes"><spring:message code="customer.account.type"/>: ${sessionScope.sessionUser.groupName}</a></li>
+                    <li class="divider"></li>
+                    <li class="nav-header"></li>
+                    <li><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="span12">
+            <form:form method="POST" commandName="toot">
 
-    <div id="accOptions" style="display:none; padding-left: 462px">
-        <a href="<c:url value='/profile?accountId=${toot.customer.userName}'/>">
-            <spring:message code="profile.title"/></a>
-
-        <div style="padding-left: 640px"><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a>
+                <form:errors path="*" cssClass="errorblock" element="div"/>
+                <c:if test="${not empty sessionScope.sessionUser}">
+                    <div class="control-group">
+                        <form:textarea id="tootMessage" path="tootMessage" maxlength="160" placeholder="Compose your toot here..." rows="3"/>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="submit" class="btn btn-primary"><spring:message code="tooter.toot"/></button>
+                        </div>
+                    </div>
+                </c:if>
+            </form:form>
         </div>
     </div>
-    <form:form method="POST" commandName="toot">
-
-        <form:errors path="*" cssClass="errorblock" element="div"/>
-        <c:if test="${not empty sessionScope.sessionCustomer}">
-            <div>
-                <form:input id="tootMessage" path="tootMessage" cssStyle="height: 50px; width: 700px; font-size: 14px;"
-                            maxlength="160"/>
-                <input type="submit" value="<spring:message code="tooter.toot"/>"
-                       style="height: 400px; width: 70px; font-size: 18px"/>
-            </div>
-        </c:if>
-        <br/>
-        <spring:message code="tooter.toots"/>
-        <br/>
-        <c:forEach items="${toot.customer.tootList}" var="tootItem">
-            <div class="${sessionScope.accountGroups[tootItem.customer.accountType]}">
+    <div class="row">
+        <div class="span12">
+            <h3><spring:message code="tooter.toots"/></h3>
+            <c:forEach items="${toot.customer.tootList}" var="tootItem">
                 <c:choose>
-                    <c:when test="${not empty sessionScope.sessionCustomer}">
-                        <a href="<c:url value='/profile?accountId=${tootItem.customer.userName}'/>">${tootItem.customer.userName}</a>
-                        ${tootItem.tootMessage}
-                        <c:if test="${sessionScope.permissionUtil.isGroupAllowed(sessionScope.removeTootPermission, sessionScope.accountGroups)}">
-                            <a href="<c:url value='/tooter/remove?accountId=${tootItem.customer.userName}&removeTootId=${tootItem.tootId}'/>"
-                               style="color: #000000; font-weight: bolder;">
-                                <spring:message code="tooter.remove.toot"/></a>
-                        </c:if>
-                        <span style="padding-left: 10px">
-                                ${sessionScope.accountGroups[tootItem.customer.accountType]} <spring:message
-                                code="customer.account"/>
-                        </span>
+                    <c:when test="${sessionScope.permissionUtil.hasRole(tootItem.customer, 'ADMINISTRATOR')}">
+                        <c:set var="accountTypeClass" value="alert alert-info admin"/>
+                    </c:when>
+                    <c:when test="${sessionScope.permissionUtil.hasRole(tootItem.customer, 'PREMIUM_USER')}">
+                        <c:set var="accountTypeClass" value="alert alert-warning premium"/>
                     </c:when>
                     <c:otherwise>
-                        ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}
+                        <c:set var="accountTypeClass" value="basic"/>
                     </c:otherwise>
                 </c:choose>
-            </div>
-            <br/>
-        </c:forEach>
-
-    </form:form>
+                <div class="well well-small ${accountTypeClass}" title="Poster's Account Type" data-content="${tootItem.customer.groupName}">
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.sessionUser}">
+                            <code><a href="<c:url value='/profile'/>">${tootItem.customer.firstName} ${tootItem.customer.lastName}</a>: ${tootItem.tootMessage}</code>
+                            <c:if test="${sessionScope.permissionUtil.hasRole(sessionScope.sessionUser, 'ADMINISTRATOR')}">
+                                <button class="close" title="Delete the toot permanently" onclick="window.location.href='<c:url value='/tooter/remove?removeTootId=${tootItem.tootId}'/>'">&times;</button>
+                            </c:if>
+                        </c:when>
+                        <c:otherwise>
+                            ${tootItem.customer.userName}&nbsp;${tootItem.tootMessage}
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:forEach>
+        </div>
+    </div>
 </div>
+<div class="modal" id="accountTypeModalContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Account Types</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+            <ul>
+                <li><b>Basic</b>: Create Toot. Toots are not highlighted.</li>
+                <li><b>Premium</b>: Create Toot. Toots are highlighted soft yellow.</li>
+                <li><b>Admin</b>: Create Toot. Delete Toot. Toots are highlighted soft blue.</li>
+            </ul>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.close').tooltip();
+        $('.admin, .premium, .basic').popover({trigger: 'hover', placement: 'top'});
+        $('#accountTypeModalContent').modal();
+        $('#accountTypeModalContent').modal('hide');
+        $('#showAccountTypes').on('click', function() {
+            $('#accountTypeModalContent').modal('show');
+        });
+    });
+</script>
 </body>
 </html>

@@ -19,9 +19,10 @@ import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.authc.AuthenticationRequest;
 import com.stormpath.sdk.authc.AuthenticationResult;
 import com.stormpath.sdk.authc.UsernamePasswordRequest;
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
+import com.stormpath.tooter.util.PermissionUtil;
 import com.stormpath.tooter.validator.LoginValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -53,12 +54,15 @@ public class LoginController {
     StormpathService stormpath;
 
     @Autowired
+    PermissionUtil permissionUtil;
+
+    @Autowired
     public LoginController(LoginValidator loginValidator) {
         this.loginValidator = loginValidator;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer,
+    public String processSubmit(@ModelAttribute("customer") User customer,
                                 BindingResult result,
                                 SessionStatus status,
                                 HttpSession session) {
@@ -79,7 +83,7 @@ public class LoginController {
 
                 Account account = authcResult.getAccount();
 
-                Customer accCustomer = new Customer(account);
+                User user = new User(account);
 
                 // If the customer queried from the database does not exist
                 // we create it in the application's internal database,
@@ -87,21 +91,19 @@ public class LoginController {
                 // that has already been authenticated in the previous call to the Stormpath API.
                 // This is because the application uses an in-memory database (HSQLDB)
                 // that only persists while the application is up.
-                Customer dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
+                User dbCustomer = customerDao.getCustomerByUserName(customer.getUserName());
                 if (dbCustomer == null) {
-                    customerDao.saveCustomer(accCustomer);
+                    customerDao.saveCustomer(user);
                 }
-
-                // We save the Stormpath account in the session for later use.
-                session.setAttribute("stormpathAccount", account);
 
                 if (dbCustomer != null) {
-                    accCustomer.setId(dbCustomer.getId());
+                    user.setId(dbCustomer.getId());
                 }
 
-                session.setAttribute("sessionCustomer", accCustomer);
+                session.setAttribute("sessionUser", user);
+                session.setAttribute("permissionUtil", permissionUtil);
 
-                returnStr = "redirect:/tooter?accountId=" + customer.getUserName();
+                returnStr = "redirect:/tooter";
 
                 status.setComplete();
             } catch (RuntimeException re) {
@@ -118,7 +120,7 @@ public class LoginController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String initForm(@ModelAttribute("customer") Customer customer, BindingResult result, ModelMap model) {
+    public String initForm(@ModelAttribute("customer") User customer, BindingResult result, ModelMap model) {
         try {
             stormpath.getTenant();
         } catch (Throwable t) {
@@ -137,7 +139,7 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/message")
     public String initMessage(@RequestParam("loginMsg") String messageKey,
-                              @ModelAttribute("customer") Customer customer,
+                              @ModelAttribute("customer") User customer,
                               BindingResult result,
                               ModelMap model) {
 
@@ -150,7 +152,7 @@ public class LoginController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/emailVerificationTokens")
     public String accountVerification(@RequestParam("sptoken") String token,
-                                      @ModelAttribute("customer") Customer customer,
+                                      @ModelAttribute("customer") User customer,
                                       BindingResult result) {
 
         String returnStr = "login";

@@ -15,16 +15,16 @@
  */
 package com.stormpath.tooter.model.dao;
 
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 
 /**
  * @author Elder Crisostomo
  */
 public interface CustomerDao {
 
-    Customer getCustomerByUserName(String userName) throws Exception;
+    User getCustomerByUserName(String userName) throws Exception;
 
-    Customer saveCustomer(Customer customer) throws Exception;
+    User saveCustomer(User customer) throws Exception;
 
-    Customer updateCustomer(Customer customer) throws Exception;
+    User updateCustomer(User customer) throws Exception;
 }

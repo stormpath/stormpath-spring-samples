@@ -15,15 +15,11 @@
  */
 package com.stormpath.tooter.controller;
 
-import com.stormpath.sdk.account.Account;
-import com.stormpath.sdk.group.GroupMembership;
-import com.stormpath.sdk.group.GroupMembershipList;
-import com.stormpath.tooter.model.Customer;
 import com.stormpath.tooter.model.Toot;
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.dao.TootDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
-import com.stormpath.tooter.util.PermissionUtil;
 import com.stormpath.tooter.validator.TootValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,9 +35,7 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Elder Crisostomo
@@ -61,8 +55,6 @@ public class TootController {
     @Autowired
     StormpathService stormpath;
 
-    @Autowired
-    PermissionUtil permissionUtil;
 
     public TootController() {
     }
@@ -80,11 +72,11 @@ public class TootController {
 
         tootValidator.validate(toot, result);
 
-        Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
+        User sessionUser = (User) session.getAttribute("sessionUser");
 
         if (!result.hasErrors()) {
 
-            Customer persistCustomer = new Customer(sessionCustomer);
+            User persistCustomer = new User(sessionUser);
 
             List<Toot> tootList;
             Toot persistToot = new Toot();
@@ -98,18 +90,18 @@ public class TootController {
                 tootList = tootDao.getTootsByUserId(persistCustomer.getId());
 
                 for (Toot itemToot : tootList) {
-                    itemToot.setCustomer(sessionCustomer);
+                    itemToot.setCustomer(sessionUser);
                 }
 
                 Collections.sort(tootList);
-                sessionCustomer.setTootList(tootList);
+                sessionUser.setTootList(tootList);
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
 
         toot.setTootMessage("");
-        toot.setCustomer(sessionCustomer);
+        toot.setCustomer(sessionUser);
 
         status.setComplete();
 
@@ -119,58 +111,38 @@ public class TootController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/tooter")
-    public String initForm(@RequestParam("accountId") String userName,
-                           ModelMap model,
+    public String initForm(ModelMap model,
                            @ModelAttribute("toot") Toot toot,
                            BindingResult result,
                            HttpSession session) {
 
         List<Toot> tootList;
 
-        Toot tooot = new Toot();
+        Toot newToot = new Toot();
 
         try {
 
-            Customer customer = (Customer) session.getAttribute("sessionCustomer");
+            User user = (User) session.getAttribute("sessionUser");
 
-            if (customer == null || customer.getId() == null) {
-
-                Customer dbCustomer = customerDao.getCustomerByUserName(userName);
-                customer = new Customer(dbCustomer);
-            } else {
-
-                session.setAttribute("permissionUtil", permissionUtil);
-
-                session.setAttribute("removeTootPermission", PermissionUtil.REMOVE_TOOT_PERMISSION);
-
-                Account account = (Account) session.getAttribute("stormpathAccount");
-
-                Map<String, String> groupURLs = new HashMap<String, String>();
-                groupURLs.put(Customer.BASIC_ACCOUNT_TYPE, Customer.BASIC_ACCOUNT_TYPE);
-
-                GroupMembershipList groupMembershipList = account.getGroupMemberships();
-
-                for (GroupMembership groupMembership : groupMembershipList) {
-                    groupURLs.put(groupMembership.getGroup().getHref(), groupMembership.getGroup().getName());
-                }
-
-                session.setAttribute("accountGroups", groupURLs);
+            if (user == null || user.getId() == null) {
+                // if they're not in the session, they're probably not logged in
+                return "redirect:/login";
             }
 
-            tootList = tootDao.getTootsByUserId(customer.getId());
+            tootList = tootDao.getTootsByUserId(user.getId());
 
             for (Toot itemToot : tootList) {
-                itemToot.setCustomer(customer);
+                itemToot.setCustomer(user);
             }
 
             Collections.sort(tootList);
-            customer.setTootList(tootList);
-            tooot.setCustomer(customer);
+            user.setTootList(tootList);
+            newToot.setCustomer(user);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        model.addAttribute("toot", tooot);
+        model.addAttribute("toot", newToot);
 
         return "tooter";
     }
@@ -186,13 +158,13 @@ public class TootController {
         try {
             tootDao.removeTootById(Integer.valueOf(removeTootId));
             userName = userName == null || userName.isEmpty() ?
-                    ((Customer) session.getAttribute("sessionCustomer")).getUserName() :
+                    ((User) session.getAttribute("sessionUser")).getUserName() :
                     userName;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
-        return "redirect:/tooter?accountId=" + userName;
+        return "redirect:/tooter";
     }
 }

@@ -18,11 +18,12 @@ package com.stormpath.tooter.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.group.Group;
 import com.stormpath.sdk.group.GroupMembership;
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.ProfileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +35,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Elder Crisostomo
@@ -53,6 +52,12 @@ public class ProfileController {
     @Autowired
     StormpathService stormpath;
 
+    @Value("${stormpath.sdk.administrator.rest.url}")
+    private String administratorGroupURL;
+
+    @Value("${stormpath.sdk.premium.rest.url}")
+    private String premiumGroupURL;
+
     public ProfileController() {
     }
 
@@ -62,13 +67,13 @@ public class ProfileController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer,
+    public String processSubmit(@ModelAttribute("user") User user,
                                 BindingResult result,
                                 SessionStatus status,
                                 HttpSession session,
                                 ModelMap model) {
 
-        profileValidator.validate(customer, result);
+        profileValidator.validate(user, result);
 
         if (!result.hasErrors()) {
 
@@ -79,69 +84,51 @@ public class ProfileController {
                 // An account can also be retrieved from the DataStore,
                 // like the way we do it to get an Application or Directory object,
                 // if the account's Rest URL is known to the application.
-                Account account = (Account) session.getAttribute("stormpathAccount");
-                account.setSurname(customer.getLastName());
-                account.setEmail(customer.getEmail());
-                account.setGivenName(customer.getFirstName());
+
+                User sessionUser = (User) session.getAttribute("sessionUser");
+                Account account = sessionUser.getAccount();
+                account.setGivenName(user.getFirstName());
+                account.setSurname(user.getFirstName());
+                account.setEmail(user.getEmail());
 
                 if (account.getGroupMemberships().iterator().hasNext()) {
-
                     GroupMembership groupMembership = account.getGroupMemberships().iterator().next();
-                    if (!groupMembership.getGroup().getHref().equals(customer.getAccountType())) {
-
+                    if (!groupMembership.getGroup().getHref().equals(user.getGroupUrl())) {
                         groupMembership.delete();
-                        account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
                     }
-
-                } else {
-
-                    account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
                 }
 
+                if (user.getGroupUrl() != null && !user.getGroupUrl().isEmpty()) {
+                    account.addGroup(stormpath.getDataStore().getResource(user.getGroupUrl(), Group.class));
+                }
 
                 account.save();
 
-                Customer sessionCustomer = (Customer) session.getAttribute("sessionCustomer");
-                sessionCustomer.setAccountType(customer.getAccountType());
-                sessionCustomer.setEmail(customer.getEmail());
-                sessionCustomer.setFirstName(customer.getFirstName());
-                sessionCustomer.setLastName(customer.getLastName());
-
-                customer.setUserName(sessionCustomer.getUserName());
-                customer.setTootList(sessionCustomer.getTootList());
+                user.setAccount(account);
+                user.setUserName(sessionUser.getUserName());
+                user.setTootList(sessionUser.getTootList());
 
                 model.addAttribute("messageKey", "updated");
-                model.addAttribute("customer", customer);
-
-
+                model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+                model.addAttribute("PREMIUM_URL", premiumGroupURL);
+                model.addAttribute("user", user);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             status.setComplete();
-
-
         }
         return "profile";
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public String initForm(ModelMap model, HttpSession session) {
+        User user = (User) session.getAttribute("sessionUser");
 
+        model.addAttribute("user", user);
+        model.addAttribute("ADMINISTRATOR_URL", administratorGroupURL);
+        model.addAttribute("PREMIUM_URL", premiumGroupURL);
 
-        Customer customer = (Customer) session.getAttribute("sessionCustomer");
-
-        Map<String, String> groupMap = new HashMap<String, String>();
-
-        for (Group group : stormpath.getDirectory().getGroups()) {
-            groupMap.put(group.getHref(), group.getName());
-        }
-
-        session.setAttribute("groupMap", groupMap);
-
-        model.addAttribute("customer", customer);
-
-        //return form view
-        return customer == null ? "redirect:/login/message?loginMsg=loginRequired" : "profile";
+        return user == null ? "redirect:/login" : "profile";
     }
 }

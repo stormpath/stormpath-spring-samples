@@ -34,7 +34,7 @@ public class Toot implements Serializable, Comparable<Toot> {
     String tootMessage;
 
     @ManyToOne
-    Customer customer;
+    User customer;
 
 
     public int getTootId() {
@@ -45,11 +45,11 @@ public class Toot implements Serializable, Comparable<Toot> {
         this.tootId = tootId;
     }
 
-    public Customer getCustomer() {
+    public User getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(User customer) {
         this.customer = customer;
     }
 

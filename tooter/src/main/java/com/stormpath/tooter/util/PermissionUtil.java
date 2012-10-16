@@ -15,16 +15,11 @@
  */
 package com.stormpath.tooter.util;
 
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.sdk.StormpathService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Elder Crisostomo
@@ -32,59 +27,28 @@ import java.util.Map;
 @Component
 public class PermissionUtil {
 
-    public static final String REMOVE_TOOT_PERMISSION = "remove.toot";
+    @Value("${stormpath.sdk.administrator.rest.url}")
+    private String administratorGroupURL;
 
-    private Map<String, List<String>> permissionsMap;
+    @Value("${stormpath.sdk.premium.rest.url}")
+    private String premiumGroupURL;
 
     @Autowired
     StormpathService stormpath;
 
-    @PostConstruct
-    void init() {
-        permissionsMap = new HashMap<String, List<String>>();
-        List<String> groups = new ArrayList<String>();
+    // Temporarily doing a string based to the expression language limitations with enums
+    public boolean hasRole(User user, String role) {
+        boolean hasRole = false;
 
-        groups.add(stormpath.getAdministratorGroupURL());
-        permissionsMap.put(REMOVE_TOOT_PERMISSION, groups);
-    }
-
-    @PreDestroy
-    void unload() {
-        permissionsMap.clear();
-        permissionsMap = null;
-    }
-
-    public boolean isGroupAllowed(String permissionId, Map<String, String> groupMap) {
-
-        boolean isGroupAllowed = false;
-
-        if (permissionId != null && groupMap != null) {
-
-            if (permissionsMap.containsKey(permissionId)) {
-
-                List<String> permissionGroupURLs = permissionsMap.get(permissionId);
-
-                outer:
-                for (String group : permissionGroupURLs) {
-
-                    if (groupMap.containsKey(group)) {
-
-                        isGroupAllowed = true;
-                        break;
-                    } else {
-
-                        for (String key : groupMap.keySet()) {
-
-                            if (key.contains(group)) {
-                                isGroupAllowed = true;
-                                break outer;
-                            }
-                        }
-                    }
-                }
+        if (user.getAccount().getGroupMemberships().iterator().hasNext()) {
+            String groupHref = user.getAccount().getGroupMemberships().iterator().next().getGroup().getHref();
+            if (role.equalsIgnoreCase("ADMINISTRATOR")) {
+                hasRole = groupHref.equals(administratorGroupURL);
+            } else if (role.equalsIgnoreCase("PREMIUM_USER")) {
+                hasRole = groupHref.equals(premiumGroupURL);
             }
         }
 
-        return isGroupAllowed;
+        return hasRole;
     }
 }

@@ -18,7 +18,7 @@ package com.stormpath.tooter.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.directory.Directory;
 import com.stormpath.sdk.group.Group;
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
 import com.stormpath.tooter.validator.SignUpValidator;
@@ -63,7 +63,7 @@ public class SignUpController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("customer") Customer customer, ModelMap model, BindingResult result, SessionStatus status) {
+    public String processSubmit(@ModelAttribute("customer") User customer, ModelMap model, BindingResult result, SessionStatus status) {
 
         singUpValidator.validate(customer, result);
 
@@ -93,9 +93,9 @@ public class SignUpController {
             Directory directory = stormpath.getDirectory();
             directory.createAccount(account);
 
-            if (!Customer.BASIC_ACCOUNT_TYPE.equals(customer.getAccountType())) {
-                account.addGroup(stormpath.getDataStore().getResource(customer.getAccountType(), Group.class));
-            }
+//            if (!User.NO_GROUP.equals(customer.getGroup())) {
+//                account.addGroup(stormpath.getDataStore().getResource(customer.getGroup(), Group.class));
+//            }
 
             customer.setUserName(userName);
             customerDao.saveCustomer(customer);
@@ -121,7 +121,7 @@ public class SignUpController {
     @RequestMapping(method = RequestMethod.GET)
     public String initForm(ModelMap model) {
 
-        Customer cust = new Customer();
+        User cust = new User();
 
         Map<String, String> groupMap = null;
 

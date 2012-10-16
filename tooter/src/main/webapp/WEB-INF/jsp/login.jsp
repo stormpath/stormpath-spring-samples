@@ -18,49 +18,51 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title id="pageTitle"><spring:message code="account.login"/></title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/styles/style.css" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="<c:url value='/assets/img/favicon.ico'/>"/>
 </head>
-<body>
-<div class="contentpanel" element="div">
-    <h1>
-        <spring:message code="welcome.message"/>
-    </h1>
+<body style="padding-top: 15px;">
+<div class="container-fluid">
+    <div class="hero-unit">
+        <h1>
+            <spring:message code="welcome.message"/>
+        </h1>
 
-    <div>
-        <spring:message code="welcome.sample.app"/>
-    </div>
-    <form:form method="POST" commandName="customer" action="/login">
-
-        <form:errors path="*" cssClass="errorblock" element="div" htmlEscape="false"/>
-        <c:if test="${not empty messageKey}">
-            <div class="messageblock">
-                <spring:message code="login.message.${messageKey}"/>
+        <h3>
+            <spring:message code="welcome.sample.app"/>
+        </h3>
+        <form:form method="POST" commandName="customer" action="/login">
+            <c:set var="controlGroupClass" value="control-group" scope="page"/>
+            <spring:hasBindErrors name="customer">
+                <c:set var="controlGroupClass" value="control-group error" scope="page"/>
+            </spring:hasBindErrors>
+            <div class="<c:out value="${controlGroupClass}"/>">
+                <form:errors path="*" cssClass="help-block" element="span" htmlEscape="false"/>
             </div>
-        </c:if>
-        <div>
-            <label for="userName"><spring:message code="customer.userName"/></label>
-            <form:input id="userName" path="userName"/>
-        </div>
-        <div>
-            <label for="password"><spring:message code="customer.password"/></label>
-            <form:password id="password" path="password"/>
-        </div>
-        <div id="buttons">
-            <div class="login" style="padding-left: 150px">
-                <input type="submit" value="<spring:message code="account.login"/>"/>
+            <div class="<c:out value="${controlGroupClass}"/>">
+                <label class="control-label" for="userName"><spring:message code="customer.userName"/></label>
+                <form:input id="userName" path="userName"/>
             </div>
-            <div class="help">
+            <div class="<c:out value="${controlGroupClass}"/>">
+                <label class="control-label" for="password"><spring:message code="customer.password"/></label>
+                <form:password id="password" path="password"/>
+            </div>
+            <div id="control-group">
+                <button type="submit" class="btn"><spring:message code="account.login"/></button><br/><br/>
+            </div>
+            <div id="control-group">
                 <a href="<c:url value='/password/forgot'/>"><spring:message code="password.forgot"/></a><br>
                 <spring:message code="account.dont.have.one"/>
-                <span style="padding-left:2px">
-                    <a href="<c:url value='/signUp'/>"><spring:message code="account.signup"/></a>
-                </span>
+                <a href="<c:url value='/signUp'/>"><spring:message code="account.signup"/></a>
             </div>
-        </div>
-    </form:form>
+        </form:form>
+    </div>
 </div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 </body>
 </html>

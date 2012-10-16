@@ -15,7 +15,7 @@
  */
 package com.stormpath.tooter.validator;
 
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -29,7 +29,7 @@ public class LoginValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return Customer.class.isAssignableFrom(clazz);
+        return User.class.isAssignableFrom(clazz);
     }
 
     @Override

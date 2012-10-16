@@ -15,7 +15,7 @@
  */
 package com.stormpath.tooter.model.dao;
 
-import com.stormpath.tooter.model.Customer;
+import com.stormpath.tooter.model.User;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -33,19 +33,19 @@ public class DefaultCustomerDao extends BaseHibernateDao implements CustomerDao 
 
 
     @Override
-    public Customer getCustomerByUserName(String userName) throws Exception {
+    public User getCustomerByUserName(String userName) throws Exception {
 
-        Criteria criteria = getSession().createCriteria(Customer.class);
+        Criteria criteria = getSession().createCriteria(User.class);
         criteria.add(Restrictions.eq("userName", userName));
         List<?> list = new ArrayList<Object>();
         list.addAll(criteria.list());
 
-        Customer customer = null;
+        User customer = null;
 
         if (!list.isEmpty()) {
             for (Object obj : list) {
                 if (obj != null) {
-                    customer = (Customer) obj;
+                    customer = (User) obj;
                     break;
                 }
             }
@@ -54,14 +54,14 @@ public class DefaultCustomerDao extends BaseHibernateDao implements CustomerDao 
     }
 
     @Override
-    public Customer saveCustomer(Customer customer) throws Exception {
+    public User saveCustomer(User customer) throws Exception {
 
         save(customer);
         return customer;
     }
 
     @Override
-    public Customer updateCustomer(Customer customer) throws Exception {
+    public User updateCustomer(User customer) throws Exception {
 
         update(customer);
 
