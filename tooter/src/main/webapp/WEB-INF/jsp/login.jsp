@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~ Copyright 2013 Stormpath, Inc. and contributors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
         <h3>
             <spring:message code="welcome.sample.app"/>
         </h3>
-        <form:form method="POST" commandName="customer" action="/login">
+        <form:form method="POST" commandName="customer">
             <c:set var="controlGroupClass" value="control-group" scope="page"/>
             <spring:hasBindErrors name="customer">
                 <c:set var="controlGroupClass" value="control-group error" scope="page"/>
@@ -43,6 +43,11 @@
             <div class="<c:out value="${controlGroupClass}"/>">
                 <form:errors path="*" cssClass="help-block" element="span" htmlEscape="false"/>
             </div>
+            <c:if test="${not empty messageKey}">
+                <div class="<c:out value="${controlGroupClass}"/>">
+                    <spring:message code="login.message.${messageKey}"/>
+                </div>
+            </c:if>
             <div class="<c:out value="${controlGroupClass}"/>">
                 <label class="control-label" for="userName"><spring:message code="customer.userName"/></label>
                 <form:input id="userName" path="userName"/>
@@ -52,7 +57,8 @@
                 <form:password id="password" path="password"/>
             </div>
             <div id="control-group">
-                <button type="submit" class="btn btn-primary"><spring:message code="account.login"/></button><br/><br/>
+                <button type="submit" class="btn btn-primary"><spring:message code="account.login"/></button>
+                <br/><br/>
             </div>
             <div id="control-group">
                 <a href="<c:url value='/password/forgot'/>"><spring:message code="password.forgot"/></a><br>

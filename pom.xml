@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~ Copyright 2013 Stormpath, Inc. and contributors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
     <groupId>com.stormpath.samples.spring</groupId>
     <artifactId>stormpath-spring-samples-root</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.3-SNAPSHOT</version>
+    <version>0.2.4-SNAPSHOT</version>
 
     <name>Stormpath Spring Sample Applications</name>
     <url>https://github.com/stormpath/stormpath-spring-samples</url>
@@ -339,7 +339,7 @@
                 </executions>
                 <configuration>
                     <providerSelection>1.7</providerSelection>
-                    <source>src/main/groovy</source>
+                    <source>src / main / groovy</source>
                 </configuration>
                 <dependencies>
                     <dependency>
