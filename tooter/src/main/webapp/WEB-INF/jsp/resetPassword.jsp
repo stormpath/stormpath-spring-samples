@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~ Copyright 2013 Stormpath, Inc. and contributors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -29,20 +29,26 @@
         <h3><spring:message code="reset.password.title"/></h3>
 
         <form:form method="POST" commandName="user">
-            <div class="control-group">
+            <c:set var="controlGroupClass" value="control-group" scope="page"/>
+            <spring:hasBindErrors name="user">
+                <c:set var="controlGroupClass" value="control-group error" scope="page"/>
+            </spring:hasBindErrors>
+
+            <div class="<c:out value="${controlGroupClass}"/>">
                 <spring:message code="reset.password.message"/>
             </div>
-            <div class="control-group">
-                <form:errors path="*" cssClass="errorblock" element="div"/>
+            <div class="<c:out value="${controlGroupClass}"/>">
+                <form:errors path="*" cssClass="help-block" element="span" htmlEscape="false"/>
             </div>
-            <div class="control-group">
+            <div class="<c:out value="${controlGroupClass}"/>">
                 <label for="email"><spring:message code="customer.email"/></label>
                 <form:input id="email" path="email"/>
             </div>
             <div class="control-group">
                 <div class="controls">
                     <a class="btn" href="<c:url value='/login'/>"><spring:message code="return.message"/></a>
-                   <button class="btn btn-primary" type="submit"><spring:message code="customer.password.reset"/></button>
+                    <button class="btn btn-primary" type="submit"><spring:message
+                            code="customer.password.reset"/></button>
                 </div>
             </div>
         </form:form>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Stormpath, Inc. and contributors.
+ * Copyright 2013 Stormpath, Inc. and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ import org.springframework.web.bind.support.SessionStatus;
 import javax.servlet.http.HttpSession;
 
 /**
- * @since 0.1
  * @author Elder Crisostomo
+ * @since 0.1
  */
 @Controller
 @RequestMapping("/login")
@@ -116,6 +116,14 @@ public class LoginController {
         }
 
         return returnStr;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "message")
+    public String processSubmitMsg(@ModelAttribute("customer") User customer,
+                                   BindingResult result,
+                                   SessionStatus status,
+                                   HttpSession session) {
+        return processSubmit(customer, result, status, session);
     }
 
     @RequestMapping(method = RequestMethod.GET)

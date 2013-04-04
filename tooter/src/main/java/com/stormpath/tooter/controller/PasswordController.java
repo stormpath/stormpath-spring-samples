@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Stormpath, Inc. and contributors.
+ * Copyright 2013 Stormpath, Inc. and contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.stormpath.tooter.controller;
 
 import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.resource.ResourceException;
 import com.stormpath.tooter.model.User;
 import com.stormpath.tooter.model.dao.CustomerDao;
 import com.stormpath.tooter.model.sdk.StormpathService;
@@ -29,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -76,8 +78,8 @@ public class PasswordController {
         } else {
             try {
                 stormpath.getApplication().sendPasswordResetEmail(customer.getEmail());
-            } catch (RuntimeException re) {
-                result.addError(new ObjectError("email", re.getMessage()));
+            } catch (ResourceException re) {
+                result.addError(new ObjectError("email", re.getCode() == 404 ? "The provided email for password reset does not exist." : re.getMessage()));
                 re.printStackTrace();
                 return "resetPassword";
             }
@@ -95,7 +97,7 @@ public class PasswordController {
     }
 
     @RequestMapping(value = "/password/reset", method = RequestMethod.GET)
-    public String initChangePassword(User cust) {
+    public String initChangePassword(User cust, Model model) {
 
         if (!StringUtils.hasText(cust.getSptoken())) {
             //invalid page access - no one should visit this page unless they're resetting their password and they have
@@ -103,20 +105,21 @@ public class PasswordController {
             return "redirect:/password/forgot";
         }
 
+        model.addAttribute("customer", cust);
         //show the form:
         return "changePassword";
     }
 
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
-    public String processChangePassword(User customer, BindingResult result, HttpSession session) {
+    public String processChangePassword(@ModelAttribute("customer") User user, BindingResult result, HttpSession session) {
 
-        changePasswordValidator.validate(customer, result);
+        changePasswordValidator.validate(user, result);
 
         if (result.hasErrors()) {
             return "changePassword";
         }
 
-        String sptoken = customer.getSptoken();
+        String sptoken = user.getSptoken();
 
         if (!StringUtils.hasText(sptoken)) {
             //invalid page access - should have an sptoken from the setup form.
@@ -128,14 +131,14 @@ public class PasswordController {
             Account account = stormpath.getApplication().verifyPasswordResetToken(sptoken);
 
             //token is valid, set the password and sync to Stormpath:
-            account.setPassword(customer.getPassword());
+            account.setPassword(user.getPassword());
             account.save();
 
             //remove any stale value:
             session.removeAttribute("stormpathAccount");
 
-        } catch (RuntimeException re) {
-            result.addError(new ObjectError("password", re.getMessage()));
+        } catch (ResourceException re) {
+            result.addError(new ObjectError("password", re.getCode() == 404 ? "The provided password reset token is invalid." : re.getMessage()));
             re.printStackTrace();
             return "changePassword";
         }

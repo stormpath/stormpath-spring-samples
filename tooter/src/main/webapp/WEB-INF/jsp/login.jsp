@@ -44,7 +44,7 @@
                 <form:errors path="*" cssClass="help-block" element="span" htmlEscape="false"/>
             </div>
             <c:if test="${not empty messageKey}">
-                <div class="<c:out value="${controlGroupClass}"/>">
+                <div class="alert alert-success">
                     <spring:message code="login.message.${messageKey}"/>
                 </div>
             </c:if>
