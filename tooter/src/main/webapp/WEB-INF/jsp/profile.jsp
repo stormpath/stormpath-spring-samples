@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~ Copyright 2013 Stormpath, Inc. and contributors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -28,12 +28,15 @@
     <div class="navbar-inner">
         <a class="brand" style="margin-left: 0px;" href="https://www.stormpath.com">Tooter</a>
         <ul class="nav">
-            <li><a href="/tooter">Home</a></li>
-            <li class="active"><a href="/profile">Profile</a></li>
+            <li><a href="<c:url value='/tooter'/>">Home</a></li>
+            <li class="active"><a href="<c:url value='/profile'/>">Profile</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${sessionScope.sessionUser.firstName} ${sessionScope.sessionUser.lastName} <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle"
+                   data-toggle="dropdown">${sessionScope.sessionUser.firstName} ${sessionScope.sessionUser.lastName} <b
+                        class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#" id="showAccountTypes"><spring:message code="customer.account.type"/>: ${sessionScope.sessionUser.groupName}</a></li>
+                    <li><a href="#" id="showAccountTypes"><spring:message
+                            code="customer.account.type"/>: ${sessionScope.sessionUser.groupName}</a></li>
                     <li class="divider"></li>
                     <li class="nav-header"></li>
                     <li><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a></li>
@@ -72,7 +75,8 @@
                     <form:input id="email" path="email"/>
                 </div>
                 <div class="<c:out value="${controlGroupClass}"/>">
-                    <label class="radio inline" style="margin-left: -18px !important;"><spring:message code="customer.account.type"/>:</label>&nbsp;
+                    <label class="radio inline" style="margin-left: -18px !important;"><spring:message
+                            code="customer.account.type"/>:</label>&nbsp;
                     <label class="radio inline">
                         <form:radiobutton path="groupUrl" cssClass="radio" value="${ADMINISTRATOR_URL}"/> Administrator
                     </label>
@@ -85,14 +89,15 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                       <button type="submit" class="btn btn-primary"><spring:message code="profile.update"/></button>
+                        <button type="submit" class="btn btn-primary"><spring:message code="profile.update"/></button>
                     </div>
                 </div>
             </form:form>
         </div>
     </div>
 </div>
-<div class="modal" id="accountTypeModalContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal" id="accountTypeModalContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3 id="myModalLabel">Account Types</h3>
@@ -113,10 +118,10 @@
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#accountTypeModalContent').modal();
         $('#accountTypeModalContent').modal('hide');
-        $('#showAccountTypes').on('click', function() {
+        $('#showAccountTypes').on('click', function () {
             $('#accountTypeModalContent').modal('show');
         });
     });

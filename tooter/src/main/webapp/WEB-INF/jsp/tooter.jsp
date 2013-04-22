@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright 2012 Stormpath, Inc. and contributors.
+  ~ Copyright 2013 Stormpath, Inc. and contributors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -29,12 +29,15 @@
     <div class="navbar-inner">
         <a class="brand" style="margin-left: 0px;" href="https://www.stormpath.com">Tooter</a>
         <ul class="nav">
-            <li class="active"><a href="/tooter">Home</a></li>
-            <li><a href="/profile">Profile</a></li>
+            <li class="active"><a href="<c:url value='/tooter'/>">Home</a></li>
+            <li><a href="<c:url value='/profile'/>">Profile</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">${sessionScope.sessionUser.firstName} ${sessionScope.sessionUser.lastName} <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle"
+                   data-toggle="dropdown">${sessionScope.sessionUser.firstName} ${sessionScope.sessionUser.lastName} <b
+                        class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#" id="showAccountTypes"><spring:message code="customer.account.type"/>: ${sessionScope.sessionUser.groupName}</a></li>
+                    <li><a href="#" id="showAccountTypes"><spring:message
+                            code="customer.account.type"/>: ${sessionScope.sessionUser.groupName}</a></li>
                     <li class="divider"></li>
                     <li class="nav-header"></li>
                     <li><a href="<c:url value='/logout'/>"><spring:message code="tooter.logout"/></a></li>
@@ -51,7 +54,8 @@
                 <form:errors path="*" cssClass="errorblock" element="div"/>
                 <c:if test="${not empty sessionScope.sessionUser}">
                     <div class="control-group">
-                        <form:textarea id="tootMessage" path="tootMessage" maxlength="160" placeholder="Compose your toot here..." rows="3"/>
+                        <form:textarea id="tootMessage" path="tootMessage" maxlength="160"
+                                       placeholder="Compose your toot here..." rows="3"/>
                     </div>
                     <div class="control-group">
                         <div class="controls">
@@ -77,12 +81,17 @@
                         <c:set var="accountTypeClass" value="basic"/>
                     </c:otherwise>
                 </c:choose>
-                <div class="well well-small ${accountTypeClass}" title="Poster's Account Type" data-content="${tootItem.customer.groupName}">
+                <div class="well well-small ${accountTypeClass}" title="Poster's Account Type"
+                     data-content="${tootItem.customer.groupName}">
                     <c:choose>
                         <c:when test="${not empty sessionScope.sessionUser}">
-                            <code><a href="<c:url value='/profile'/>">${tootItem.customer.firstName} ${tootItem.customer.lastName}</a>: ${tootItem.tootMessage}</code>
+                            <code><a
+                                    href="<c:url value='/profile'/>">${tootItem.customer.firstName} ${tootItem.customer.lastName}</a>: ${tootItem.tootMessage}
+                            </code>
                             <c:if test="${sessionScope.permissionUtil.hasRole(sessionScope.sessionUser, 'ADMINISTRATOR')}">
-                                <button class="close" title="Delete the toot permanently" onclick="window.location.href='<c:url value='/tooter/remove?id=${tootItem.tootId}'/>'">&times;</button>
+                                <button class="close" title="Delete the toot permanently"
+                                        onclick="window.location.href='<c:url
+                                                value='/tooter/remove?id=${tootItem.tootId}'/>'">&times;</button>
                             </c:if>
                         </c:when>
                         <c:otherwise>
@@ -99,18 +108,19 @@
         </div>
     </div>
 </div>
-<div class="modal" id="accountTypeModalContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal" id="accountTypeModalContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3 id="myModalLabel">Account Types</h3>
     </div>
     <div class="modal-body">
         <p>
-            <ul>
-                <li><b>Basic</b>: Create Toot. Toots are not highlighted.</li>
-                <li><b>Premium</b>: Create Toot. Toots are highlighted soft yellow.</li>
-                <li><b>Admin</b>: Create Toot. Delete Toot. Toots are highlighted soft blue.</li>
-            </ul>
+        <ul>
+            <li><b>Basic</b>: Create Toot. Toots are not highlighted.</li>
+            <li><b>Premium</b>: Create Toot. Toots are highlighted soft yellow.</li>
+            <li><b>Admin</b>: Create Toot. Delete Toot. Toots are highlighted soft blue.</li>
+        </ul>
         </p>
     </div>
     <div class="modal-footer">
@@ -120,12 +130,12 @@
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.close').tooltip();
         $('.admin, .premium, .basic').popover({trigger: 'hover', placement: 'top'});
         $('#accountTypeModalContent').modal();
         $('#accountTypeModalContent').modal('hide');
-        $('#showAccountTypes').on('click', function() {
+        $('#showAccountTypes').on('click', function () {
             $('#accountTypeModalContent').modal('show');
         });
     });
